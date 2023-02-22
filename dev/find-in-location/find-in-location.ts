@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 
 export const notExistingOptions = {returnEmptyResults: "returnEmptyResults", throwError: "throwError"} as const;

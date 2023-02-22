@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchEngine = exports.searchEngineOptionsDefaults = exports.searchTarget = exports.notExistingOptions = void 0;
-const fs_1 = __importDefault(require("fs"));
+const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
 exports.notExistingOptions = { returnEmptyResults: "returnEmptyResults", throwError: "throwError" };
 exports.searchTarget = { both: "both", files: "files", folders: "folders" };
@@ -92,7 +92,7 @@ class SearchEngine {
     searchRecursively(results, needle, haystack, depth) {
         let newDepth = depth - 1;
         results.stats.foldersScanned++;
-        for (let dirent of fs_1.default.readdirSync(haystack, { withFileTypes: true, encoding: "utf-8" })) {
+        for (let dirent of fs_extra_1.default.readdirSync(haystack, { withFileTypes: true, encoding: "utf-8" })) {
             results.stats.entitiesCompared++;
             const hayOriginal = dirent.name;
             const hay = this.options.caseSensitiveMatch ? hayOriginal : hayOriginal.toLowerCase();
@@ -135,7 +135,7 @@ class SearchEngine {
         needle = this.options.caseSensitiveMatch ? needle : needle.toLowerCase();
         const result = this.initiateSearchResults();
         //Checking if haystack exist and acting based on what's in the options
-        if (!fs_1.default.existsSync(haystack)) {
+        if (!fs_extra_1.default.existsSync(haystack)) {
             if (this.options.ifHaystackDoesNotExist === exports.notExistingOptions.throwError) {
                 throw new Error(`Haystack "${haystack}" does not exist!`);
             }

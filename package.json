@@ -12,8 +12,13 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
-    "@types/node": "^18.11.18",
     "fs": "^0.0.1-security",
-    "path": "^0.12.7"
+    "fs-extra": "^11.1.0",
+    "path": "^0.12.7",
+    "@types/switch-scripting": "https://github.com/enfocus-switch/types-switch-scripting/archive/22.0.0.tar.gz"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.1",
+    "@types/node": "16.11.7"
   }
 }
