@@ -1,11 +1,11 @@
 /// <reference types="switch-scripting" />
-export type connIndex = {
+export declare type connIndex = {
     all: Connection[];
     byName: {
         [p: string]: Connection[];
     };
 };
-export type options = {
+export declare type options = {
     newName?: string;
 };
 export declare class OutConnectionManager {
