@@ -1,6 +1,6 @@
 import {NameGenerator} from "../main";
 
-export type config = {
+type config = {
     tag: string,
     scope?: Scope
 }
@@ -22,13 +22,13 @@ function makeConfigReasonable(config?: config): config {
     return config
 }
 
-export type entry<T> = {
-    id: string
-    timeAdded: number
-    timeModified: number
-    data: T
+type entry<T> = {
+    _id: string
+    _timeAdded: number
+    _timeModified: number
+    _data: T
 }
-export class Entry<T> {
+class Entry<T> {
     private _id: string;
     private _timeAdded: number;
     private _timeModified: number;
@@ -70,22 +70,22 @@ export class Entry<T> {
     //Returns entry data object
     getEntryDataObject(): entry<T> {
         return {
-            id: this._id,
-            timeAdded: this._timeAdded,
-            timeModified: this._timeModified,
-            data: this._data
+            _id: this._id,
+            _timeAdded: this._timeAdded,
+            _timeModified: this._timeModified,
+            _data: this._data
         }
     }
 
     constructor(e: entry<T>) {
-        this._id = e.id
-        this._timeAdded = e.timeAdded
-        this._timeModified = e.timeModified
-        this._data = e.data
+        this._id = e._id
+        this._timeAdded = e._timeAdded
+        this._timeModified = e._timeModified
+        this._data = e._data
     }
 }
 
-export class GlobalDataManager<T> {
+class GlobalDataManager<T> {
     private readonly switch: Switch;
     private readonly cfg: config;
     private readonly randGen: NameGenerator.AdvancedStringGenerator;
@@ -141,10 +141,10 @@ export class GlobalDataManager<T> {
         const now = + new Date();
 
         const e = new Entry<T>({
-            id: id,
-            timeAdded: now,
-            timeModified: now,
-            data: data
+            _id: id,
+            _timeAdded: now,
+            _timeModified: now,
+            _data: data
         });
 
         this.globalDataObject[id] = e;

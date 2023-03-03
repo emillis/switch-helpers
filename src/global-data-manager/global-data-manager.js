@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GlobalDataManager = exports.Entry = void 0;
 const main_1 = require("../main");
 const defaultConfig = {
     tag: "",
@@ -53,20 +52,19 @@ class Entry {
     //Returns entry data object
     getEntryDataObject() {
         return {
-            id: this._id,
-            timeAdded: this._timeAdded,
-            timeModified: this._timeModified,
-            data: this._data
+            _id: this._id,
+            _timeAdded: this._timeAdded,
+            _timeModified: this._timeModified,
+            _data: this._data
         };
     }
     constructor(e) {
-        this._id = e.id;
-        this._timeAdded = e.timeAdded;
-        this._timeModified = e.timeModified;
-        this._data = e.data;
+        this._id = e._id;
+        this._timeAdded = e._timeAdded;
+        this._timeModified = e._timeModified;
+        this._data = e._data;
     }
 }
-exports.Entry = Entry;
 class GlobalDataManager {
     switch;
     cfg;
@@ -116,10 +114,10 @@ class GlobalDataManager {
         }
         const now = +new Date();
         const e = new Entry({
-            id: id,
-            timeAdded: now,
-            timeModified: now,
-            data: data
+            _id: id,
+            _timeAdded: now,
+            _timeModified: now,
+            _data: data
         });
         this.globalDataObject[id] = e;
         return e;
@@ -159,4 +157,3 @@ class GlobalDataManager {
         return this;
     }
 }
-exports.GlobalDataManager = GlobalDataManager;
