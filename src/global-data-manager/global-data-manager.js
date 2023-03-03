@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GlobalDataManager = exports.Entry = void 0;
 const main_1 = require("../main");
 const defaultConfig = {
     tag: "",
@@ -65,6 +66,7 @@ class Entry {
         this._data = e._data;
     }
 }
+exports.Entry = Entry;
 class GlobalDataManager {
     switch;
     cfg;
@@ -157,3 +159,4 @@ class GlobalDataManager {
         return this;
     }
 }
+exports.GlobalDataManager = GlobalDataManager;

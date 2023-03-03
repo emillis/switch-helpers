@@ -1,6 +1,6 @@
 import {NameGenerator} from "../main";
 
-type config = {
+export type config = {
     tag: string,
     scope?: Scope
 }
@@ -22,13 +22,13 @@ function makeConfigReasonable(config?: config): config {
     return config
 }
 
-type entry<T> = {
+export type entry<T> = {
     _id: string
     _timeAdded: number
     _timeModified: number
     _data: T
 }
-class Entry<T> {
+export class Entry<T> {
     private _id: string;
     private _timeAdded: number;
     private _timeModified: number;
@@ -85,7 +85,7 @@ class Entry<T> {
     }
 }
 
-class GlobalDataManager<T> {
+export class GlobalDataManager<T> {
     private readonly switch: Switch;
     private readonly cfg: config;
     private readonly randGen: NameGenerator.AdvancedStringGenerator;
