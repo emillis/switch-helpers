@@ -115,7 +115,7 @@ export class GlobalDataManager<T> {
         }
     }
 
-    addEntry(data: T, id?: string) {
+    addEntry(data: T, id?: string): Entry<T> {
         if (!this.initiated) throw this.notInitiatedErrMsg;
         if (id === undefined) {
             let tmpId = this.randGen.generate();
@@ -129,12 +129,15 @@ export class GlobalDataManager<T> {
 
         const now = + new Date();
 
-        this.globalDataObject[id] = new Entry<T>({
+        const e = new Entry<T>({
             id: id,
             timeAdded: now,
             timeModified: now,
             data: data
-        })
+        });
+
+        this.globalDataObject[id] = e;
+        return e;
     }
 
     //Unlocks global data without saving newly added / removed shared data.

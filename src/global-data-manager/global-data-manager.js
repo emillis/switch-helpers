@@ -104,12 +104,14 @@ class GlobalDataManager {
             id = tmpId;
         }
         const now = +new Date();
-        this.globalDataObject[id] = new Entry({
+        const e = new Entry({
             id: id,
             timeAdded: now,
             timeModified: now,
             data: data
         });
+        this.globalDataObject[id] = e;
+        return e;
     }
     //Unlocks global data without saving newly added / removed shared data.
     async unlockGlobalData() {

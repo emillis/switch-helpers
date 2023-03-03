@@ -36,7 +36,7 @@ export declare class GlobalDataManager<T> {
     };
     getAvailableEntries(): Entry<T>[];
     removeEntries(...ids: string[]): void;
-    addEntry(data: T, id?: string): void;
+    addEntry(data: T, id?: string): Entry<T>;
     unlockGlobalData(): Promise<void>;
     saveAndUnlockGlobalData(): Promise<void>;
     constructor(s: Switch, cfg: config);
