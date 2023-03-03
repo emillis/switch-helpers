@@ -7,7 +7,7 @@ export type config = {
 
 const defaultConfig = {
     tag: "",
-    scope: Scope.FlowElement
+    scope: EnfocusSwitch.Scope.FlowElement
 }
 
 function makeConfigReasonable(config?: config): config {

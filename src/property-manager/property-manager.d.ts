@@ -1,5 +1,5 @@
 /// <reference types="switch-scripting" />
-export declare type propertyManagerOptions = {
+export type propertyManagerOptions = {
     throwErrorIfTagUndefined?: boolean;
 };
 export declare class PropertyManager {

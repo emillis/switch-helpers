@@ -4,7 +4,7 @@ exports.GlobalDataManager = exports.Entry = void 0;
 const main_1 = require("../main");
 const defaultConfig = {
     tag: "",
-    scope: Scope.FlowElement
+    scope: EnfocusSwitch.Scope.FlowElement
 };
 function makeConfigReasonable(config) {
     config = config || {

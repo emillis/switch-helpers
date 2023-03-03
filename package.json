@@ -12,7 +12,6 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
-    "@types/switch-scripting": "github:enfocus-switch/types-switch-scripting",
     "dateformat": "^5.0.3",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.0",
@@ -21,6 +20,7 @@
   "devDependencies": {
     "@types/dateformat": "^5.0.0",
     "@types/fs-extra": "^11.0.1",
-    "@types/node": "16.11.7"
+    "@types/node": "16.11.7",
+    "@types/switch-scripting": "https://github.com/enfocus-switch/types-switch-scripting/archive/22.0.0.tar.gz"
   }
 }
