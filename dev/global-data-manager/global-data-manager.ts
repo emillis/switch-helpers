@@ -29,27 +29,30 @@ export type entry<T> = {
     data: T
 }
 export class Entry<T> {
-    private readonly entry: entry<T>;
+    private _id: string;
+    private _timeAdded: number;
+    private _timeModified: number;
+    private _data: T;
 
     //Returns entry ID
     id(newId?: string): string {
-        if (newId !== undefined) this.entry.id = `${newId}`
+        if (newId !== undefined) this._id = `${newId}`
 
-        return this.entry.id
+        return this._id
     }
 
     //Returns time when the entry was added (timestamp)
     timeAdded(newTime?: number): number {
-        if (newTime !== undefined) this.entry.timeAdded = newTime;
+        if (newTime !== undefined) this._timeAdded = newTime;
 
-        return this.entry.timeAdded
+        return this._timeAdded
     }
 
     //Returns time when the entry was last modified
     timeModified(newTime?: number): number {
-        if (newTime !== undefined) this.entry.timeModified = newTime;
+        if (newTime !== undefined) this._timeModified = newTime;
 
-        return this.entry.timeModified;
+        return this._timeModified;
     }
 
     //Updates timeModified field with current timestamp
@@ -59,18 +62,26 @@ export class Entry<T> {
 
     //Returns the custom data added by the client
     data(newData?: T): T {
-        if (newData !== undefined) this.entry.data = newData;
+        if (newData !== undefined) this._data = newData;
 
-        return this.entry.data
+        return this._data
     }
 
     //Returns entry data object
     getEntryDataObject(): entry<T> {
-        return this.entry
+        return {
+            id: this._id,
+            timeAdded: this._timeAdded,
+            timeModified: this._timeModified,
+            data: this._data
+        }
     }
 
     constructor(e: entry<T>) {
-        this.entry = e
+        this._id = e.id
+        this._timeAdded = e.timeAdded
+        this._timeModified = e.timeModified
+        this._data = e.data
     }
 }
 

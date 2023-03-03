@@ -10,7 +10,10 @@ export type entry<T> = {
     data: T;
 };
 export declare class Entry<T> {
-    private readonly entry;
+    private _id;
+    private _timeAdded;
+    private _timeModified;
+    private _data;
     id(newId?: string): string;
     timeAdded(newTime?: number): number;
     timeModified(newTime?: number): number;

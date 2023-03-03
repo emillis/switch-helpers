@@ -18,24 +18,27 @@ function makeConfigReasonable(config) {
     return config;
 }
 class Entry {
-    entry;
+    _id;
+    _timeAdded;
+    _timeModified;
+    _data;
     //Returns entry ID
     id(newId) {
         if (newId !== undefined)
-            this.entry.id = `${newId}`;
-        return this.entry.id;
+            this._id = `${newId}`;
+        return this._id;
     }
     //Returns time when the entry was added (timestamp)
     timeAdded(newTime) {
         if (newTime !== undefined)
-            this.entry.timeAdded = newTime;
-        return this.entry.timeAdded;
+            this._timeAdded = newTime;
+        return this._timeAdded;
     }
     //Returns time when the entry was last modified
     timeModified(newTime) {
         if (newTime !== undefined)
-            this.entry.timeModified = newTime;
-        return this.entry.timeModified;
+            this._timeModified = newTime;
+        return this._timeModified;
     }
     //Updates timeModified field with current timestamp
     updateTimeModified() {
@@ -44,15 +47,23 @@ class Entry {
     //Returns the custom data added by the client
     data(newData) {
         if (newData !== undefined)
-            this.entry.data = newData;
-        return this.entry.data;
+            this._data = newData;
+        return this._data;
     }
     //Returns entry data object
     getEntryDataObject() {
-        return this.entry;
+        return {
+            id: this._id,
+            timeAdded: this._timeAdded,
+            timeModified: this._timeModified,
+            data: this._data
+        };
     }
     constructor(e) {
-        this.entry = e;
+        this._id = e.id;
+        this._timeAdded = e.timeAdded;
+        this._timeModified = e.timeModified;
+        this._data = e.data;
     }
 }
 exports.Entry = Entry;
