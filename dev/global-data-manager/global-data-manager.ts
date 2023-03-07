@@ -5,19 +5,14 @@ export type config = {
     scope?: Scope
 }
 
-const defaultConfig = {
-    tag: "",
-    scope: EnfocusSwitch.Scope.FlowElement
-}
-
 function makeConfigReasonable(config?: config): config {
     config = config || {
-        tag: defaultConfig.tag,
-        scope: defaultConfig.scope
+        tag: "",
+        scope: Scope.FlowElement
     }
 
     if (!config.tag) throw `Invalid global data tag "${config.tag}" provided!`;
-    if (config.scope === undefined) config.scope = defaultConfig.scope
+    if (config.scope === undefined) config.scope = Scope.FlowElement
 
     return config
 }
@@ -154,13 +149,13 @@ export class GlobalDataManager<T> {
     //Unlocks global data without saving newly added / removed shared data.
     async unlockGlobalData() {
         if (!this.initiated) throw this.notInitiatedErrMsg;
-        await this.switch.setGlobalData(this.cfg.scope || defaultConfig.scope, this.cfg.tag, this.originalGlobalDataObject)
+        await this.switch.setGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, this.originalGlobalDataObject)
     }
 
     //Saves newly added / removed shared data to the global data and unlocks it.
     async saveAndUnlockGlobalData() {
         if (!this.initiated) throw this.notInitiatedErrMsg;
-        await this.switch.setGlobalData(this.cfg.scope || defaultConfig.scope, this.cfg.tag, this.globalDataObject)
+        await this.switch.setGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, this.globalDataObject)
     }
 
     constructor(s: Switch, cfg: config) {
@@ -176,7 +171,7 @@ export class GlobalDataManager<T> {
     }
 
     async init(): Promise<GlobalDataManager<T>> {
-        const values: {[ID: string]: entry<T>} = await this.switch.getGlobalData(this.cfg.scope || defaultConfig.scope, this.cfg.tag, true) || {}
+        const values: {[ID: string]: entry<T>} = await this.switch.getGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, true) || {}
 
         for (const value of Object.values(values)) {
             const e1 = new Entry<T>(value);
