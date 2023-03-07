@@ -2,6 +2,22 @@ export type propertyManagerOptions = {
     throwErrorIfTagUndefined?: boolean
 }
 
+export type getPropertyFromListOptions = {
+    caseSensitive?: boolean
+    partialMatch?: boolean
+}
+
+function makeGetPropertyFromListOptionsReasonable(options?: getPropertyFromListOptions): getPropertyFromListOptions {
+    options = options || {
+        caseSensitive: true,
+        partialMatch: false
+    }
+
+    options.caseSensitive = options.caseSensitive === undefined ? true : options.caseSensitive;
+    options.partialMatch = options.partialMatch === undefined ? false : options.partialMatch;
+
+    return options
+}
 function makePropertyManagerOptionsReasonable(options?: propertyManagerOptions): propertyManagerOptions {
     options = options || {
         throwErrorIfTagUndefined: true
@@ -57,6 +73,24 @@ export class PropertyManager {
         if (val.toLowerCase() === "yes") return true;
         if (val.toLowerCase() === "no") return false;
         return !!val;
+    }
+    async getPropertyFromList<T>(listObject: T, tag: string, options?: getPropertyFromListOptions): Promise<T | undefined> {
+        options = makeGetPropertyFromListOptionsReasonable(options);
+        if (typeof listObject !== "object") throw `Value supplied is not an object!`;
+        let tagVal = await this.getStringProperty(tag) || "";
+        if (options.caseSensitive !== true) tagVal = tagVal.toLowerCase();
+
+        const myEnum = <{[key: string]: string}><unknown>listObject
+
+        for (const key of Object.keys(myEnum)) {
+            const val = options.caseSensitive === true ? `${myEnum[key]}` : `${myEnum[key]}`.toLowerCase();
+
+            if (options.partialMatch === false ? (val !== tagVal) : (val.search(tagVal) === -1)) continue;
+
+            return <T><unknown>myEnum[key]
+        }
+
+        return undefined
     }
 
     constructor(flowElement: FlowElement, options?: propertyManagerOptions) {
