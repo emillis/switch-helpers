@@ -34,8 +34,9 @@ export declare class Reporter {
     getReportAsHTMLString(): string;
     saveAsHtml(location?: string): string;
     sendWithReportAttached(job: Job, flowElement: FlowElement, options?: {
+        datasetName?: string;
         tmpLocation?: string;
         newJobName?: string;
-    }): void;
+    }): Promise<void>;
     constructor(pageSetup?: pageSetup);
 }

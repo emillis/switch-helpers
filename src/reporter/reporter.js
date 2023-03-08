@@ -144,21 +144,32 @@ class Reporter {
             location = (new main_1.GlobalSwitchConfig.Fetcher()).getValueOrFail("TempMetadataFileLocation");
         }
         const parsedLocation = path_1.default.parse(location);
-        const base = parsedLocation.base || main_1.NameGenerator.newName({ suffix: "_Report.html" });
+        let base = parsedLocation.base;
+        if (!base) {
+            const nameGenerator = new main_1.NameGenerator.AdvancedStringGenerator({ type: "random", composition: "alphaNumericOnly", charCase: "upperOnly", minLen: 30, maxLen: 30, });
+            base = `report-${nameGenerator.generate()}-${nameGenerator.generate()}.html`;
+        }
         if (!parsedLocation.dir) {
             throw new Error(`Something went wrong.. While generating html report, directory has not been acquired! Got "${parsedLocation.dir}".`);
         }
         return path_1.default.join(parsedLocation.base, this.FileSaver.save(path_1.default.join(parsedLocation.dir, base), this.getReportAsHTMLString()));
     }
-    sendWithReportAttached(job, flowElement, options) {
+    async sendWithReportAttached(job, flowElement, options) {
         if (!job) {
             throw `"job" is not provided as an argument to method "sendJobToConnection"!`;
         }
+        const datasetGenerator = new main_1.DatasetGenerator.DatasetGenerator(job, options?.tmpLocation);
         options = options || {};
-        // tmpFileLocation = tmpFileLocation || (GetGlobalSwitchConfig())["TempMetadataFileLocation"]
         const ConnManager = new main_1.OutConnectionManager.OutConnectionManager(flowElement);
+        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, main_1.DatasetGenerator.allowedDatasetModels.Opaque, this.saveAsHtml(options.tmpLocation));
         if (this.counts.errors()) {
-            ConnManager.trafficLights.sendToDataError(job, { newName: options.newJobName });
+            await ConnManager.trafficLights.sendToDataError(job, { newName: options.newJobName });
+        }
+        else if (this.counts.warnings()) {
+            await ConnManager.trafficLights.sendToDataWarning(job, { newName: options.newJobName });
+        }
+        else if (this.counts.successes()) {
+            await ConnManager.trafficLights.sendToDataSuccess(job, { newName: options.newJobName });
         }
     }
     constructor(pageSetup) {

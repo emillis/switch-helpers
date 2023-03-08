@@ -1,9 +1,9 @@
 /// <reference types="switch-scripting" />
-export type config = {
+export declare type config = {
     tag: string;
     scope?: Scope;
 };
-export type entry<T> = {
+export declare type entry<T> = {
     _id: string;
     _timeAdded: number;
     _timeModified: number;
