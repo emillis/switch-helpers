@@ -1,6 +1,7 @@
 //Constructor for ease of creation of Switch Report
 import {NameGenerator, GlobalSwitchConfig, FileSaver, OutConnectionManager, DatasetGenerator} from "../main";
 import path from "path";
+import * as fs from "fs-extra";
 
 export type pageSetup = { TabTitle: string, PageTitle: string }
 export type messages = { Errors: string[], Warnings: string[], Successes: string[], Logs: string[] }
@@ -150,28 +151,33 @@ export class Reporter {
     }
 
     //Saves the report as HTML to the location provided (optional) and returns full path to the report
-    saveAsHtml(location?: string): string {
-        if (!location) {location = (new GlobalSwitchConfig.Fetcher()).getValueOrFail("TempMetadataFileLocation")}
-        const parsedLocation = path.parse(location)
-        let base = parsedLocation.base;
-        if (!base) {
-            const nameGenerator = new NameGenerator.AdvancedStringGenerator({type: "random", composition: "alphaNumericOnly", charCase: "upperOnly", minLen: 30, maxLen: 30,});
-            base = `report-${nameGenerator.generate()}-${nameGenerator.generate()}.html`;
+    saveAsHtml(options?: {name?: string, location?: string}): string {
+        options = options || {}
+        if (!options?.location) options.location = (new GlobalSwitchConfig.Fetcher()).getValueOrFail("TempMetadataFileLocation")
+        if (!options?.location) throw `Invalid location "${options.location}" supplied! The location would be used for temporarily storing reports`;
+        const nameGenerator = new NameGenerator.AdvancedStringGenerator({type: "random", composition: "alphaNumericOnly", charCase: "upperOnly", minLen: 30, maxLen: 30});
+
+        let fullPath: string | undefined = options.name ? path.join(options.location, options.name) : undefined;
+
+        while (!fullPath || fs.existsSync(fullPath)) {
+            fullPath = path.join(options.location, `report-${nameGenerator.generate()}-${nameGenerator.generate()}.html`)
         }
 
-        if (!parsedLocation.dir) {throw new Error(`Something went wrong.. While generating html report, directory has not been acquired! Got "${parsedLocation.dir}".`)}
+        if (!fullPath) {throw `Invalid location "${fullPath}" supplied as place where to save an html report!`}
 
-        return path.join(parsedLocation.base, this.FileSaver.save(path.join(parsedLocation.dir, base), this.getReportAsHTMLString()))
+        this.FileSaver.save(fullPath, this.getReportAsHTMLString())
+        return fullPath
     }
 
-    async sendWithReportAttached(job: Job, flowElement: FlowElement, options?: {datasetName?: string, tmpLocation?: string, newJobName?: string}) {
+    async sendWithReportAttached(job: Job, flowElement: FlowElement, options?: {datasetName?: string, tmpLocation?: string, tmpReportFileName?: string, newJobName?: string}) {
         if (!job) {throw `"job" is not provided as an argument to method "sendJobToConnection"!`}
         const datasetGenerator = new DatasetGenerator.DatasetGenerator(job, options?.tmpLocation);
         options = options || {};
 
         const ConnManager = new OutConnectionManager.OutConnectionManager(flowElement);
 
-        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, DatasetGenerator.allowedDatasetModels.Opaque, this.saveAsHtml(options.tmpLocation))
+        // await datasetGenerator.addDataset(options.datasetName || `default-report-name`, DatasetGenerator.allowedDatasetModels.Opaque, `C:\\Users\\service_switch\\Desktop\\dummy.txt`)
+        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, DatasetGenerator.allowedDatasetModels.Opaque, this.saveAsHtml({location: options.tmpLocation, name: options.tmpReportFileName}))
 
         if (this.counts.errors()) {
             await ConnManager.trafficLights.sendToDataError(job, {newName: options.newJobName})

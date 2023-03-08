@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +30,7 @@ exports.Reporter = void 0;
 //Constructor for ease of creation of Switch Report
 const main_1 = require("../main");
 const path_1 = __importDefault(require("path"));
+const fs = __importStar(require("fs-extra"));
 class Reporter {
     pageSetup;
     messages;
@@ -139,20 +163,22 @@ class Reporter {
         `;
     }
     //Saves the report as HTML to the location provided (optional) and returns full path to the report
-    saveAsHtml(location) {
-        if (!location) {
-            location = (new main_1.GlobalSwitchConfig.Fetcher()).getValueOrFail("TempMetadataFileLocation");
+    saveAsHtml(options) {
+        options = options || {};
+        if (!options?.location)
+            options.location = (new main_1.GlobalSwitchConfig.Fetcher()).getValueOrFail("TempMetadataFileLocation");
+        if (!options?.location)
+            throw `Invalid location "${options.location}" supplied! The location would be used for temporarily storing reports`;
+        const nameGenerator = new main_1.NameGenerator.AdvancedStringGenerator({ type: "random", composition: "alphaNumericOnly", charCase: "upperOnly", minLen: 30, maxLen: 30 });
+        let fullPath = options.name ? path_1.default.join(options.location, options.name) : undefined;
+        while (!fullPath || fs.existsSync(fullPath)) {
+            fullPath = path_1.default.join(options.location, `report-${nameGenerator.generate()}-${nameGenerator.generate()}.html`);
         }
-        const parsedLocation = path_1.default.parse(location);
-        let base = parsedLocation.base;
-        if (!base) {
-            const nameGenerator = new main_1.NameGenerator.AdvancedStringGenerator({ type: "random", composition: "alphaNumericOnly", charCase: "upperOnly", minLen: 30, maxLen: 30, });
-            base = `report-${nameGenerator.generate()}-${nameGenerator.generate()}.html`;
+        if (!fullPath) {
+            throw `Invalid location "${fullPath}" supplied as place where to save an html report!`;
         }
-        if (!parsedLocation.dir) {
-            throw new Error(`Something went wrong.. While generating html report, directory has not been acquired! Got "${parsedLocation.dir}".`);
-        }
-        return path_1.default.join(parsedLocation.base, this.FileSaver.save(path_1.default.join(parsedLocation.dir, base), this.getReportAsHTMLString()));
+        this.FileSaver.save(fullPath, this.getReportAsHTMLString());
+        return fullPath;
     }
     async sendWithReportAttached(job, flowElement, options) {
         if (!job) {
@@ -161,7 +187,8 @@ class Reporter {
         const datasetGenerator = new main_1.DatasetGenerator.DatasetGenerator(job, options?.tmpLocation);
         options = options || {};
         const ConnManager = new main_1.OutConnectionManager.OutConnectionManager(flowElement);
-        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, main_1.DatasetGenerator.allowedDatasetModels.Opaque, this.saveAsHtml(options.tmpLocation));
+        // await datasetGenerator.addDataset(options.datasetName || `default-report-name`, DatasetGenerator.allowedDatasetModels.Opaque, `C:\\Users\\service_switch\\Desktop\\dummy.txt`)
+        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, main_1.DatasetGenerator.allowedDatasetModels.Opaque, this.saveAsHtml({ location: options.tmpLocation, name: options.tmpReportFileName }));
         if (this.counts.errors()) {
             await ConnManager.trafficLights.sendToDataError(job, { newName: options.newJobName });
         }

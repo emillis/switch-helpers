@@ -1,9 +1,9 @@
 /// <reference types="switch-scripting" />
-export type pageSetup = {
+export declare type pageSetup = {
     TabTitle: string;
     PageTitle: string;
 };
-export type messages = {
+export declare type messages = {
     Errors: string[];
     Warnings: string[];
     Successes: string[];
@@ -32,10 +32,14 @@ export declare class Reporter {
     addSuccesses(...msg: string[]): void;
     addLogs(...msg: string[]): void;
     getReportAsHTMLString(): string;
-    saveAsHtml(location?: string): string;
+    saveAsHtml(options?: {
+        name?: string;
+        location?: string;
+    }): string;
     sendWithReportAttached(job: Job, flowElement: FlowElement, options?: {
         datasetName?: string;
         tmpLocation?: string;
+        tmpReportFileName?: string;
         newJobName?: string;
     }): Promise<void>;
     constructor(pageSetup?: pageSetup);
