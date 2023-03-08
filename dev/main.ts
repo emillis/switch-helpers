@@ -8,3 +8,4 @@ export * as CacheManager from "./cacher/cacher";
 export * as PropertyManager from "./property-manager/property-manager";
 export * as GlobalDataManager from "./global-data-manager/global-data-manager";
 export * as DatasetGenerator from "./dataset-generator/dataset-generator";
+export * as Reporter from "./reporter/reporter";
