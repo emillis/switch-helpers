@@ -36,7 +36,7 @@ class DatasetGenerator {
         if (!location)
             throw `Failed to generate a new name for JSON dataset file!`;
         fs_extra_1.default.writeFileSync(location, JSON.stringify(data));
-        await this.job.createDataset(datasetName, location, DatasetModel.JSON);
+        await this.job.createDataset(datasetName, location, EnfocusSwitch.DatasetModel.JSON);
         return location;
     }
     //datasetName - How will the dataset be called within the metadata.
@@ -57,7 +57,7 @@ class DatasetGenerator {
             this.tmpFileLocations.push(await this.addJsonDataset(datasetName, data));
         }
         else if (model === exports.allowedDatasetModels.Opaque) {
-            await this.job.createDataset(datasetName, data, DatasetModel.Opaque);
+            await this.job.createDataset(datasetName, data, EnfocusSwitch.DatasetModel.Opaque);
         }
     }
     //This method removes all temporary created files (Switch requires a files being created before it gets attached to a job as a dataset)

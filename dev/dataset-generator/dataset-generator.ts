@@ -37,7 +37,7 @@ export class DatasetGenerator {
 
         fs.writeFileSync(location, JSON.stringify(data))
 
-        await this.job.createDataset(datasetName, location, DatasetModel.JSON);
+        await this.job.createDataset(datasetName, location, EnfocusSwitch.DatasetModel.JSON);
 
         return location;
     }
@@ -57,7 +57,7 @@ export class DatasetGenerator {
         if (model === allowedDatasetModels.JSON) {
             this.tmpFileLocations.push(await this.addJsonDataset(datasetName, data))
         } else if (model === allowedDatasetModels.Opaque) {
-            await this.job.createDataset(datasetName, data, DatasetModel.Opaque);
+            await this.job.createDataset(datasetName, data, EnfocusSwitch.DatasetModel.Opaque);
         }
     }
 
