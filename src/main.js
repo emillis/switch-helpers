@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
+exports.DatasetGenerator = exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
 exports.FindInLocation = __importStar(require("./find-in-location/find-in-location"));
 exports.OutConnectionManager = __importStar(require("./out-connection-manager/out-connection-manager"));
 exports.NameGenerator = __importStar(require("./name-generator/name-generator"));
@@ -33,3 +33,4 @@ exports.Logger = __importStar(require("./logger/logger"));
 exports.CacheManager = __importStar(require("./cacher/cacher"));
 exports.PropertyManager = __importStar(require("./property-manager/property-manager"));
 exports.GlobalDataManager = __importStar(require("./global-data-manager/global-data-manager"));
+exports.DatasetGenerator = __importStar(require("./dataset-generator/dataset-generator"));
