@@ -177,7 +177,7 @@ export class Reporter {
             await ConnManager.trafficLights.sendToDataError(job, {newName: options.newJobName})
         } else if (this.counts.warnings()) {
             await ConnManager.trafficLights.sendToDataWarning(job, {newName: options.newJobName})
-        } else if (this.counts.successes()) {
+        } else {
             await ConnManager.trafficLights.sendToDataSuccess(job, {newName: options.newJobName})
         }
     }
