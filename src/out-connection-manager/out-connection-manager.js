@@ -34,15 +34,15 @@ class OutConnectionManager {
         },
         //Sends job to success data connection.
         sendToDataSuccess: async function (job, options) {
-            await this.sendToData(job, Connection.Level.Success, options);
+            await this.sendToData(job, EnfocusSwitch.Connection.Level.Success, options);
         },
         //Sends job to warning data connection.
         sendToDataWarning: async function (job, options) {
-            await this.sendToData(job, Connection.Level.Warning, options);
+            await this.sendToData(job, EnfocusSwitch.Connection.Level.Warning, options);
         },
         //Sends job to error data connection.
         sendToDataError: async function (job, options) {
-            await this.sendToData(job, Connection.Level.Error, options);
+            await this.sendToData(job, EnfocusSwitch.Connection.Level.Error, options);
         },
         //Sends job to log connection with the level specified
         sendToLog: async function (job, level, model = DatasetModel.Opaque, newName) {
@@ -50,15 +50,15 @@ class OutConnectionManager {
         },
         //Sends job to success log connection.
         sendToLogSuccess: async function (job, model = DatasetModel.Opaque, newName) {
-            await this.sendToLog(job, Connection.Level.Success, model, newName);
+            await this.sendToLog(job, EnfocusSwitch.Connection.Level.Success, model, newName);
         },
         //Sends job to warning log connection.
         sendToLogWarning: async function (job, model = DatasetModel.Opaque, newName) {
-            await this.sendToLog(job, Connection.Level.Warning, model, newName);
+            await this.sendToLog(job, EnfocusSwitch.Connection.Level.Warning, model, newName);
         },
         //Sends job to error log connection.
         sendToLogError: async function (job, model = DatasetModel.Opaque, newName) {
-            await this.sendToLog(job, Connection.Level.Error, model, newName);
+            await this.sendToLog(job, EnfocusSwitch.Connection.Level.Error, model, newName);
         }
     };
     //Same as Job.SendTo(), sens the job to connection provided

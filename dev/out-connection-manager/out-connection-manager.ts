@@ -44,15 +44,15 @@ export class OutConnectionManager {
         },
         //Sends job to success data connection.
         sendToDataSuccess: async function (job: Job, options?: options) {
-            await this.sendToData(job, Connection.Level.Success, options);
+            await this.sendToData(job, EnfocusSwitch.Connection.Level.Success, options);
         },
         //Sends job to warning data connection.
         sendToDataWarning: async function (job: Job, options?: options) {
-            await this.sendToData(job, Connection.Level.Warning, options);
+            await this.sendToData(job, EnfocusSwitch.Connection.Level.Warning, options);
         },
         //Sends job to error data connection.
         sendToDataError: async function (job: Job, options?: options) {
-            await this.sendToData(job, Connection.Level.Error, options);
+            await this.sendToData(job, EnfocusSwitch.Connection.Level.Error, options);
         },
 
         //Sends job to log connection with the level specified
@@ -61,15 +61,15 @@ export class OutConnectionManager {
         },
         //Sends job to success log connection.
         sendToLogSuccess: async function(job: Job, model: DatasetModel = DatasetModel.Opaque, newName?: string) {
-            await this.sendToLog(job, Connection.Level.Success, model, newName);
+            await this.sendToLog(job, EnfocusSwitch.Connection.Level.Success, model, newName);
         },
         //Sends job to warning log connection.
         sendToLogWarning: async function(job: Job, model: DatasetModel = DatasetModel.Opaque, newName?: string) {
-            await this.sendToLog(job, Connection.Level.Warning, model, newName);
+            await this.sendToLog(job, EnfocusSwitch.Connection.Level.Warning, model, newName);
         },
         //Sends job to error log connection.
         sendToLogError: async function(job: Job, model: DatasetModel = DatasetModel.Opaque, newName?: string) {
-            await this.sendToLog(job, Connection.Level.Error, model, newName);
+            await this.sendToLog(job, EnfocusSwitch.Connection.Level.Error, model, newName);
         }
     }
 
