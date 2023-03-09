@@ -224,19 +224,19 @@ class Reporter {
         const datasetGenerator = new main_1.DatasetGenerator.DatasetGenerator(job, options?.tmpLocation);
         options = options || {};
         const ConnManager = new main_1.OutConnectionManager.OutConnectionManager(flowElement);
-        // await datasetGenerator.addDataset(options.datasetName || `default-report-name`, DatasetGenerator.allowedDatasetModels.Opaque, `C:\\Users\\service_switch\\Desktop\\dummy.txt`)
-        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, main_1.DatasetGenerator.allowedDatasetModels.Opaque, this.saveAsHtml({ location: options.tmpLocation, name: options.tmpReportFileName }));
+        const reportLocation = this.saveAsHtml({ location: options.tmpLocation, name: options.tmpReportFileName });
+        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, main_1.DatasetGenerator.allowedDatasetModels.Opaque, reportLocation);
         if (this.counts.errors()) {
             await ConnManager.trafficLights.sendToDataError(job, { newName: options.newJobName });
-            await ConnManager.trafficLights.sendToLogError(job, DatasetModel.Opaque, options.newJobName);
+            await ConnManager.trafficLights.sendToLogError(await job.createChild(reportLocation), EnfocusSwitch.DatasetModel.Opaque, options.newJobName);
         }
         else if (this.counts.warnings()) {
             await ConnManager.trafficLights.sendToDataWarning(job, { newName: options.newJobName });
-            await ConnManager.trafficLights.sendToLogWarning(job, DatasetModel.Opaque, options.newJobName);
+            await ConnManager.trafficLights.sendToLogWarning(await job.createChild(reportLocation), EnfocusSwitch.DatasetModel.Opaque, options.newJobName);
         }
         else {
             await ConnManager.trafficLights.sendToDataSuccess(job, { newName: options.newJobName });
-            await ConnManager.trafficLights.sendToLogSuccess(job, DatasetModel.Opaque, options.newJobName);
+            await ConnManager.trafficLights.sendToLogSuccess(await job.createChild(reportLocation), EnfocusSwitch.DatasetModel.Opaque, options.newJobName);
         }
     }
     constructor(pageSetup) {
