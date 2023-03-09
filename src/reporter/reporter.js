@@ -108,7 +108,7 @@ class Reporter {
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
-                <title>hello world</title>
+                <title>${this.tabTitle()}</title>
                 <style>
                     body {
                         font-family: Calibri, "Roboto", sans-serif;
@@ -227,16 +227,16 @@ class Reporter {
         const reportLocation = this.saveAsHtml({ location: options.tmpLocation, name: options.tmpReportFileName });
         await datasetGenerator.addDataset(options.datasetName || `default-report-name`, main_1.DatasetGenerator.allowedDatasetModels.Opaque, reportLocation);
         if (this.counts.errors()) {
-            await ConnManager.trafficLights.sendToDataError(job, { newName: options.newJobName });
             await ConnManager.trafficLights.sendToLogError(await job.createChild(reportLocation), EnfocusSwitch.DatasetModel.Opaque, options.newJobName);
+            await ConnManager.trafficLights.sendToDataError(job, { newName: options.newJobName });
         }
         else if (this.counts.warnings()) {
-            await ConnManager.trafficLights.sendToDataWarning(job, { newName: options.newJobName });
             await ConnManager.trafficLights.sendToLogWarning(await job.createChild(reportLocation), EnfocusSwitch.DatasetModel.Opaque, options.newJobName);
+            await ConnManager.trafficLights.sendToDataWarning(job, { newName: options.newJobName });
         }
         else {
-            await ConnManager.trafficLights.sendToDataSuccess(job, { newName: options.newJobName });
             await ConnManager.trafficLights.sendToLogSuccess(await job.createChild(reportLocation), EnfocusSwitch.DatasetModel.Opaque, options.newJobName);
+            await ConnManager.trafficLights.sendToDataSuccess(job, { newName: options.newJobName });
         }
     }
     constructor(pageSetup) {
