@@ -228,12 +228,15 @@ class Reporter {
         await datasetGenerator.addDataset(options.datasetName || `default-report-name`, main_1.DatasetGenerator.allowedDatasetModels.Opaque, this.saveAsHtml({ location: options.tmpLocation, name: options.tmpReportFileName }));
         if (this.counts.errors()) {
             await ConnManager.trafficLights.sendToDataError(job, { newName: options.newJobName });
+            await ConnManager.trafficLights.sendToLogError(job, DatasetModel.Opaque, options.newJobName);
         }
         else if (this.counts.warnings()) {
             await ConnManager.trafficLights.sendToDataWarning(job, { newName: options.newJobName });
+            await ConnManager.trafficLights.sendToLogWarning(job, DatasetModel.Opaque, options.newJobName);
         }
         else {
             await ConnManager.trafficLights.sendToDataSuccess(job, { newName: options.newJobName });
+            await ConnManager.trafficLights.sendToLogSuccess(job, DatasetModel.Opaque, options.newJobName);
         }
     }
     constructor(pageSetup) {

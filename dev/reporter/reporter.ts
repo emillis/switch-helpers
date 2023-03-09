@@ -218,10 +218,13 @@ export class Reporter {
 
         if (this.counts.errors()) {
             await ConnManager.trafficLights.sendToDataError(job, {newName: options.newJobName})
+            await ConnManager.trafficLights.sendToLogError(job, DatasetModel.Opaque, options.newJobName)
         } else if (this.counts.warnings()) {
             await ConnManager.trafficLights.sendToDataWarning(job, {newName: options.newJobName})
+            await ConnManager.trafficLights.sendToLogWarning(job, DatasetModel.Opaque, options.newJobName)
         } else {
             await ConnManager.trafficLights.sendToDataSuccess(job, {newName: options.newJobName})
+            await ConnManager.trafficLights.sendToLogSuccess(job, DatasetModel.Opaque, options.newJobName)
         }
     }
 
