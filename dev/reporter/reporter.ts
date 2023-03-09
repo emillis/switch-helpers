@@ -94,57 +94,94 @@ export class Reporter {
             <!DOCTYPE html>
             <html lang="en">
             <head>
-              <meta charset="UTF-8">
-              <title>${this.tabTitle()}</title>
-              <style>
-                #page-title {
-                  text-align: center;
-                }
+                <meta charset="UTF-8">
+                <title>hello world</title>
+                <style>
+                    body {
+                        font-family: Calibri, "Roboto", sans-serif;
+                    }
+                    #page-title {
+                        text-align: center;
+                    }
             
-                .row {
-                  display: flex;
-                  margin: 0 0 .5rem 0;
-                }
-                .row:hover {
-                  background-color: #eee;
-                }
-                .row .cell-message {
-                  flex: 24;
-                  padding: 0 0 0 1rem;
-                }
-                .row .cell-status {
-                  flex: 1rem;
-                }
+                    .row {
+                        display: flex;
+                        margin: 0 0 .5rem 0;
+                    }
+                    .row:hover {
+                        background-color: #eee;
+                    }
+                    .row .cell-message {
+                        flex: 24;
+                        padding: 0 0 0 1rem;
+                    }
+                    .row .cell-status {
+                        flex: 1rem;
+                    }
             
-                #status-info {
-                  font-size: .875rem;
-                }
-                
-                .bg-error {
-                  background-color: #dc3545;
-                }
-                .bg-warning {
-                  background-color: #ffc107;
-                }
-                .bg-success {
-                  background-color: #28a745;
-                }
-                .bg-default {
-                  background-color: #999;
-                }
-              </style>
+                    #status-info {
+                        font-size: .875rem;
+                    }
+            
+                    .bg-error {
+                        background-color: #dc3545;
+                    }
+                    .bg-warning {
+                        background-color: #ffc107;
+                    }
+                    .bg-success {
+                        background-color: #28a745;
+                    }
+                    .bg-default {
+                        background-color: #999;
+                    }
+            
+                    #stats-container {
+                        display: flex;
+                    }
+                    #stats-container .stats-entry {
+                        display: flex;
+                        flex: 24;
+                        text-align: center;
+                        font-size: 1.125rem;
+                    }
+                    #stats-container .stats-entry .contents {
+                        display: flex;
+                        margin: 0 auto;
+                    }
+                    #stats-container .stats-entry .contents .indicator {
+                        width: 1.5rem;
+                    }
+                    #stats-container .stats-entry .contents .stats {
+                    }
+                    #stats-container .stats-entry .contents .stats .label {
+                        margin: 0 .5rem 0 0;
+                    }
+                    #stats-container .stats-entry .contents .stats .count {
+                    }
+            
+                </style>
             </head>
             <body>
-              <div id="page-title">
+            
+            <div id="page-title">
                 <h2>${this.pageTitle()}</h2>
-              </div>
-              <div id="rows">
+            </div>
+            <div id="stats-container">
+                <div class="stats-entry"><div class="contents"><div class="indicator bg-error"></div><div class="stats"><span class="label">Error:</span><span class="count">${this.counts.errors()}</span></div></div></div>
+                <div class="stats-entry"><div class="contents"><div class="indicator bg-warning"></div><div class="stats"><span class="label">Warning:</span><span class="count">${this.counts.warnings()}</span></div></div></div>
+                <div class="stats-entry"><div class="contents"><div class="indicator bg-success"></div><div class="stats"><span class="label">Success:</span><span class="count">${this.counts.successes()}</span></div></div></div>
+                <div class="stats-entry"><div class="contents"><div class="indicator bg-default"></div><div class="stats"><span class="label">Log:</span><span class="count">${this.counts.logs()}</span></div></div></div>
+            </div>
+            <hr style="margin: 2rem 0">
+            <div id="rows">
                 ${rows.join("")}
-              </div>
-              <hr style="margin: 2rem 0">
-              <div id="status-info">
+            </div>
+            <hr style="margin: 2rem 0">
+            <div id="status-info">
                 Time Created: ${(new Date()).toLocaleString("en-gb")}
-              </div>
+            </div>
+            
             </body>
             </html>
         `
