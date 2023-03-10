@@ -5,6 +5,18 @@ import path from "path";
 export const allowedDatasetModels = {JSON: "JSON", Opaque: "Opaque"} as const;
 export type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
 
+export type options = {
+    replaceIfExist?: boolean
+}
+
+function makeOptionsReasonable(options?: options): options {
+    options = options || {}
+
+    if (options.replaceIfExist === undefined) options.replaceIfExist = true;
+
+    return options
+}
+
 //Typically Switch requires creating a custom file before it gets attached to a job as a dataset. This class
 //abstracts that behaviour by creating those file behind the scenes, allowing only a JS object being passed in.
 //The temporary created file can then be removed using "removeTmpFiles()" method.
@@ -42,22 +54,30 @@ export class DatasetGenerator {
         return location;
     }
 
+    private async addOpaqueDataset(datasetName: string, data: any) {
+        await this.job.createDataset(datasetName, data, EnfocusSwitch.DatasetModel.Opaque);
+    }
+
     //datasetName - How will the dataset be called within the metadata.
     //model - Use "allowedDatasetModels" for this.
     //data - In case of JSON model, data should be a JS object and in case of an opaque model, data should be a link
     //to the file which will be attached as the opaque dataset.
-    async addDataset(datasetName: string, model: allowedDatasetModels, data: any) {
+    async addDataset(datasetName: string, model: allowedDatasetModels, data: any, options?: options) {
         if (!this.checkForAllowedDatasetModels(model)) throw `Dataset model "${model}" is not allowed! Allowed dataset models are: "${Object.values(allowedDatasetModels).join(`", "`)}"`;
+
+        options = makeOptionsReasonable(options);
 
         //Checking whether the right type of variables are supplied to the function
         if (model === allowedDatasetModels.JSON && typeof data !== "object") throw `When using "${allowedDatasetModels.JSON}" dataset model, expecting to receive data type "object", got "${typeof data}".`;
         if (model === allowedDatasetModels.Opaque && typeof data !== "string") throw `When using "Opaque" DatasetModel, expecting to receive data of type "string", got "${typeof data}".`
         if (!datasetName) throw `Dataset name "${datasetName.toString()}" is invalid!`;
 
+        if (options.replaceIfExist) {try {await this.job.removeDataset(datasetName)} catch {}}
+
         if (model === allowedDatasetModels.JSON) {
             this.tmpFileLocations.push(await this.addJsonDataset(datasetName, data))
         } else if (model === allowedDatasetModels.Opaque) {
-            await this.job.createDataset(datasetName, data, EnfocusSwitch.DatasetModel.Opaque);
+            await this.addOpaqueDataset(datasetName, data)
         }
     }
 
