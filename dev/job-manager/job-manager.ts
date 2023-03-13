@@ -1,4 +1,4 @@
-export default class JobManager {
+export class JobManager {
     private readonly flowElement: FlowElement;
     private readonly listOfJobIds: string[];
     private initiated: boolean = false;

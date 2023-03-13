@@ -1,5 +1,5 @@
 /// <reference types="switch-scripting" />
-export default class JobManager {
+export declare class JobManager {
     private readonly flowElement;
     private readonly listOfJobIds;
     private initiated;

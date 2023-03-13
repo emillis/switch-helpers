@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.JobManager = void 0;
 class JobManager {
     flowElement;
     listOfJobIds;
@@ -63,4 +64,4 @@ class JobManager {
         this.listOfJobIds = listOfJobIds;
     }
 }
-exports.default = JobManager;
+exports.JobManager = JobManager;
