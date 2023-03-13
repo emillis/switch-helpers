@@ -11,6 +11,6 @@ export declare class JobManager {
     getJobOrFail(id: string): Job;
     removeJobFromJobManager(id: string): void;
     removeAllJobs(): void;
-    init(): Promise<void>;
+    init(): Promise<JobManager>;
     constructor(flowElement: FlowElement, listOfJobIds: string[]);
 }

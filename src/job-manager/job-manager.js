@@ -54,6 +54,7 @@ class JobManager {
             this.idToJob[job.getId()] = job;
         }
         this.initiated = true;
+        return this;
     }
     constructor(flowElement, listOfJobIds) {
         if (!flowElement)

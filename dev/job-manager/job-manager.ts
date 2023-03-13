@@ -48,7 +48,7 @@ export class JobManager {
         this.idToJob = {}
     }
 
-    async init() {
+    async init(): Promise<JobManager> {
         try {this.jobs = await this.flowElement.getJobs(this.listOfJobIds)} catch {}
 
         for (const job of this.jobs) {
@@ -56,6 +56,7 @@ export class JobManager {
         }
 
         this.initiated = true;
+        return this
     }
 
     constructor(flowElement: FlowElement, listOfJobIds: string[]) {
