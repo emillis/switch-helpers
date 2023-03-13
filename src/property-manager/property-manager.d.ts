@@ -1,8 +1,8 @@
 /// <reference types="switch-scripting" />
-export declare type propertyManagerOptions = {
+export type propertyManagerOptions = {
     throwErrorIfTagUndefined?: boolean;
 };
-export declare type getPropertyFromListOptions = {
+export type getPropertyFromListOptions = {
     caseSensitive?: boolean;
     partialMatch?: boolean;
 };
