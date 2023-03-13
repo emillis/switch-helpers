@@ -23,12 +23,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CacheManager = exports.Cache = exports.removeFileStatus = exports.addFileStatus = exports.allowedActions = void 0;
 const fs = __importStar(require("fs-extra"));
 const path = __importStar(require("path"));
 const statsFile = __importStar(require("./src/stats-file/stats-file"));
-const allowedActions = { createUpdate: "createUpdate", recall: "recall", remove: "remove" };
-const addFileStatus = { Ok: "Ok", FileAlreadyExists: "FileAlreadyExists", Unknown: "Unknown", InputFileNotExist: "InputFileNotExist" };
-const removeFileStatus = { Ok: "Ok", FileDoesntExist: "FileDoesntExist", Unknown: "Unknown" };
+exports.allowedActions = { createUpdate: "createUpdate", recall: "recall", remove: "remove" };
+exports.addFileStatus = { Ok: "Ok", FileAlreadyExists: "FileAlreadyExists", Unknown: "Unknown", InputFileNotExist: "InputFileNotExist" };
+exports.removeFileStatus = { Ok: "Ok", FileDoesntExist: "FileDoesntExist", Unknown: "Unknown" };
 function makeCacheAddFileOptionsReasonable(options) {
     options = options || {};
     options.overwrite = !!options.overwrite;
@@ -65,21 +66,21 @@ class Cache {
         let fileName = "";
         try {
             if (!location || !fs.existsSync(location)) {
-                return addFileStatus.InputFileNotExist;
+                return exports.addFileStatus.InputFileNotExist;
             }
             fileName = path.parse(location).base;
             if (this.statsFile.getFile(fileName) && !options.overwrite) {
-                return addFileStatus.FileAlreadyExists;
+                return exports.addFileStatus.FileAlreadyExists;
             }
             fs.copyFileSync(location, path.join(this.cacheLocation, fileName));
         }
         catch (e) {
             console.log(`${e}`);
-            return addFileStatus.Unknown;
+            return exports.addFileStatus.Unknown;
         }
         this.statsFile.addFile(fileName, metadata, belongsToGroups);
         this.statsFile.saveFile();
-        return addFileStatus.Ok;
+        return exports.addFileStatus.Ok;
     }
     addMetadataToFile(fileName, metadata) {
         this.statsFile.addMetadata(fileName, metadata);
@@ -93,15 +94,15 @@ class Cache {
         try {
             const fullPath = path.join(this.cacheLocation, name);
             if (!this.statsFile.getFile(name))
-                return removeFileStatus.FileDoesntExist;
+                return exports.removeFileStatus.FileDoesntExist;
             fs.unlinkSync(fullPath);
         }
         catch (e) {
-            return removeFileStatus.Unknown;
+            return exports.removeFileStatus.Unknown;
         }
         this.statsFile.removeFile(name);
         this.statsFile.saveFile();
-        return removeFileStatus.Ok;
+        return exports.removeFileStatus.Ok;
     }
     removeMetadata(fileName, key) {
         this.statsFile.removeMetadata(fileName, key);
@@ -160,6 +161,7 @@ class Cache {
         this.statsFile = new statsFile.StatsFile(this.cacheLocation, `${this.cacheName}.json`);
     }
 }
+exports.Cache = Cache;
 //======[CACHES MANAGER]================================================================================================
 class CacheManager {
     rootLocation;
@@ -198,6 +200,7 @@ class CacheManager {
         }
     }
 }
+exports.CacheManager = CacheManager;
 //======[TESTING]================================================================================================
 // const Manager = new CacheManager("D:\\Test\\Cache Root Location");
 // const cache = Manager.getOrInitiateCache("meow3");

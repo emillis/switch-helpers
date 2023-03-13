@@ -2,22 +2,22 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as statsFile from "./src/stats-file/stats-file";
 
-const allowedActions = {createUpdate: "createUpdate", recall: "recall", remove: "remove"} as const;
-type allowedActions = typeof allowedActions[keyof typeof allowedActions];
+export const allowedActions = {createUpdate: "createUpdate", recall: "recall", remove: "remove"} as const;
+export type allowedActions = typeof allowedActions[keyof typeof allowedActions];
 
-const addFileStatus = {Ok: "Ok", FileAlreadyExists: "FileAlreadyExists", Unknown: "Unknown", InputFileNotExist: "InputFileNotExist"} as const;
-type addFileStatus = typeof addFileStatus[keyof typeof addFileStatus];
+export const addFileStatus = {Ok: "Ok", FileAlreadyExists: "FileAlreadyExists", Unknown: "Unknown", InputFileNotExist: "InputFileNotExist"} as const;
+export type addFileStatus = typeof addFileStatus[keyof typeof addFileStatus];
 
-const removeFileStatus = {Ok: "Ok", FileDoesntExist: "FileDoesntExist", Unknown: "Unknown"} as const;
-type removeFileStatus = typeof removeFileStatus[keyof typeof removeFileStatus];
+export const removeFileStatus = {Ok: "Ok", FileDoesntExist: "FileDoesntExist", Unknown: "Unknown"} as const;
+export type removeFileStatus = typeof removeFileStatus[keyof typeof removeFileStatus];
 
 //======[CACHE MANAGER]================================================================================================
 
-type cacheAddFileOptions = {
+export type cacheAddFileOptions = {
     overwrite?: boolean
 }
 
-type fileList = {
+export type fileList = {
     count: number
     names: string[],
     moreInfo: {[p: string]: {pathToFile: string, dir: string}}
@@ -31,7 +31,7 @@ function makeCacheAddFileOptionsReasonable(options?: cacheAddFileOptions): cache
     return options
 }
 
-class Cache {
+export class Cache {
     private readonly rootLocation: string;
     private readonly cacheName: string;
     private readonly cacheLocation: string;
@@ -173,7 +173,7 @@ class Cache {
 
 //======[CACHES MANAGER]================================================================================================
 
-class CacheManager {
+export class CacheManager {
     private readonly rootLocation: string;
 
     cacheExists(name: string): boolean {
