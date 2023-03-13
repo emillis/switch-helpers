@@ -100,6 +100,9 @@ class GlobalDataManager {
             delete this.globalDataObject[id];
         }
     }
+    removeAllEntries() {
+        this.globalDataObject = {};
+    }
     addEntry(data, id) {
         if (!this.initiated)
             throw this.notInitiatedErrMsg;

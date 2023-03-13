@@ -1,9 +1,9 @@
 /// <reference types="switch-scripting" />
-export type config = {
+export declare type config = {
     tag: string;
     scope?: Scope;
 };
-export type entry<T> = {
+export declare type entry<T> = {
     _id: string;
     _timeAdded: number;
     _timeModified: number;
@@ -39,6 +39,7 @@ export declare class GlobalDataManager<T> {
     };
     getAvailableEntries(): Entry<T>[];
     removeEntries(...ids: string[]): void;
+    removeAllEntries(): void;
     addEntry(data: T, id?: string): Entry<T>;
     unlockGlobalData(): Promise<void>;
     saveAndUnlockGlobalData(): Promise<void>;

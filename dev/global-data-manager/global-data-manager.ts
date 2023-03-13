@@ -121,6 +121,10 @@ export class GlobalDataManager<T> {
         }
     }
 
+    removeAllEntries() {
+        this.globalDataObject = {}
+    }
+
     addEntry(data: T, id?: string): Entry<T> {
         if (!this.initiated) throw this.notInitiatedErrMsg;
         if (id === undefined) {
