@@ -99,6 +99,14 @@ export class GlobalDataManager<T> {
         return this.globalDataObject[id];
     }
 
+    getAllEntryIds(): string[] {
+        try {
+            return Object.keys(this.globalDataObject)
+        } catch {
+            return []
+        }
+    }
+
     getEntries(ids: string[]): {[ID: string]: Entry<T> | undefined} {
         if (!this.initiated) throw this.notInitiatedErrMsg;
         let result: {[ID: string]: Entry<T> | undefined} = {};

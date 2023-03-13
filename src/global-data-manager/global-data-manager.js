@@ -81,6 +81,14 @@ class GlobalDataManager {
             throw this.notInitiatedErrMsg;
         return this.globalDataObject[id];
     }
+    getAllEntryIds() {
+        try {
+            return Object.keys(this.globalDataObject);
+        }
+        catch {
+            return [];
+        }
+    }
     getEntries(ids) {
         if (!this.initiated)
             throw this.notInitiatedErrMsg;
