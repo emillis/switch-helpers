@@ -22,8 +22,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JobManager = exports.Reporter = exports.DatasetGenerator = exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
+exports.Reporter = exports.DatasetGenerator = exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
 exports.FindInLocation = __importStar(require("./find-in-location/find-in-location"));
 exports.OutConnectionManager = __importStar(require("./out-connection-manager/out-connection-manager"));
 exports.NameGenerator = __importStar(require("./name-generator/name-generator"));
@@ -35,4 +38,4 @@ exports.PropertyManager = __importStar(require("./property-manager/property-mana
 exports.GlobalDataManager = __importStar(require("./global-data-manager/global-data-manager"));
 exports.DatasetGenerator = __importStar(require("./dataset-generator/dataset-generator"));
 exports.Reporter = __importStar(require("./reporter/reporter"));
-exports.JobManager = __importStar(require("./job-manager/job-manager"));
+__exportStar(require("./job-manager/job-manager"), exports);
