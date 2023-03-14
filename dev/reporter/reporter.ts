@@ -6,7 +6,14 @@ import * as fs from "fs-extra";
 export type pageSetup = { TabTitle: string, PageTitle: string }
 export type messages = { Errors: string[], Warnings: string[], Successes: string[], Logs: string[] }
 
-export class Reporter {
+export interface IReporter {
+    addErrors(...msg: string[]): void
+    addWarnings(...msg: string[]): void
+    addSuccesses(...msg: string[]): void
+    addLogs(...msg: string[]): void
+}
+
+export class Reporter implements IReporter{
     private readonly pageSetup: pageSetup;
     private readonly messages: messages;
     private readonly FileSaver: FileSaver.FileSaver;

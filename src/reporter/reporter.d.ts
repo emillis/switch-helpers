@@ -1,15 +1,21 @@
 /// <reference types="switch-scripting" />
-export type pageSetup = {
+export declare type pageSetup = {
     TabTitle: string;
     PageTitle: string;
 };
-export type messages = {
+export declare type messages = {
     Errors: string[];
     Warnings: string[];
     Successes: string[];
     Logs: string[];
 };
-export declare class Reporter {
+export interface IReporter {
+    addErrors(...msg: string[]): void;
+    addWarnings(...msg: string[]): void;
+    addSuccesses(...msg: string[]): void;
+    addLogs(...msg: string[]): void;
+}
+export declare class Reporter implements IReporter {
     private readonly pageSetup;
     private readonly messages;
     private readonly FileSaver;
