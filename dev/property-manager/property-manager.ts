@@ -92,6 +92,15 @@ export class PropertyManager {
 
         return undefined
     }
+    async getArrayProperty(tag: string): Promise<string[] | undefined> {
+        let val = await this.getProperty(tag);
+
+        if (val === undefined) return undefined
+
+        if (!Array.isArray(val)) val = [val]
+
+        return val
+    }
 
     constructor(flowElement: FlowElement, options?: propertyManagerOptions) {
         this.flowElement = flowElement;

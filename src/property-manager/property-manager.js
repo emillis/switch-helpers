@@ -83,6 +83,14 @@ class PropertyManager {
         }
         return undefined;
     }
+    async getArrayProperty(tag) {
+        let val = await this.getProperty(tag);
+        if (val === undefined)
+            return undefined;
+        if (!Array.isArray(val))
+            val = [val];
+        return val;
+    }
     constructor(flowElement, options) {
         this.flowElement = flowElement;
         this.options = makePropertyManagerOptionsReasonable(options);
