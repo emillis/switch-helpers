@@ -30,6 +30,12 @@ export type fileList = {
         };
     };
 };
+export type filters = {
+    inGroups?: string[];
+    hasMetadata?: {
+        [key: string]: string;
+    };
+};
 export declare class Cache {
     private readonly rootLocation;
     private readonly cacheName;
@@ -50,6 +56,7 @@ export declare class Cache {
     removeMetadata(fileName: string, key: string): void;
     removeGroup(fileName: string, group_name: string): void;
     getFiles(name: string): fileList;
+    getFilesWithFilter(name: string, filters?: filters): fileList;
     getFilesInGroup(group_name: string): fileList | undefined;
     getMetadata(fileName: string, metadata_key: string): string | undefined;
     getFilesWithMetadataKey(key: string): fileList | undefined;

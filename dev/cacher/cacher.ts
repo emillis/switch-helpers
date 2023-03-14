@@ -23,6 +23,19 @@ export type fileList = {
     moreInfo: {[p: string]: {pathToFile: string, dir: string}}
 }
 
+export type filters = {
+    inGroups?: string[],
+    hasMetadata?: {[key: string]: string}
+}
+
+function makeFiltersReasonable(filters?: filters): filters {
+    const f: filters = filters || {}
+
+    if (f.inGroups === undefined) f.inGroups = [];
+    if (f.hasMetadata === undefined) f.hasMetadata = {};
+
+    return f
+}
 function makeCacheAddFileOptionsReasonable(options?: cacheAddFileOptions): cacheAddFileOptions {
     options = options || {}
 
@@ -119,6 +132,46 @@ export class Cache {
         let results: fileList = {count: 0, names: [], moreInfo: {}}
 
         for (const fm of this.statsFile.matchFiles(name)) {
+            results.count++;
+
+            const name = fm.getName();
+            const loc = fm.getLocation();
+
+            results.names.push(name);
+            results.moreInfo[name] = {dir: loc, pathToFile: path.join(loc, name)}
+        }
+
+        return results
+    }
+    getFilesWithFilter(name: string, filters?: filters): fileList {
+        filters = makeFiltersReasonable(filters);
+        let results: fileList = {count: 0, names: [], moreInfo: {}}
+
+        for (const fm of this.statsFile.matchFiles(name)) {
+            let inGroups: boolean = true;
+            for (const g of (filters.inGroups || [])) {
+                if (fm.inGroup(g)) continue;
+                inGroups = false
+                break
+            }
+            if (!inGroups) continue;
+
+            let hasMetadata: boolean = true;
+            for (const key of Object.keys(filters.hasMetadata || {})) {
+                const val = (filters.hasMetadata || {})[key]
+                const mVal = `${fm.getMetadata(key)}`;
+
+                if (mVal === undefined) {
+                    hasMetadata = false
+                    break
+                }
+                if (mVal === val) continue;
+
+                hasMetadata = false
+                break
+            }
+            if (!hasMetadata) continue;
+
             results.count++;
 
             const name = fm.getName();
@@ -230,6 +283,7 @@ export class CacheManager {
 // console.log(cache.getMetadata("hellox.pdf", "holla"));
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
+// console.log(cache.getFilesWithFilter(".pdf", {inGroups: ["123", "aaa"], hasMetadata: {"holla2": "asd1"}}));
 
 
 
