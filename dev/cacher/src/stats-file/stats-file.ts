@@ -243,7 +243,7 @@ export class FilesManager {
             return
         }
 
-        const fileStruct = {name: name, location: this.storageRootLocation, groups: [], metadata: metadata};
+        const fileStruct = {name: name, location: this.storageRootLocation, groups: belongsToGroups, metadata: metadata};
         const fm = new FileManager(fileStruct)
 
         this.files.push(fileStruct);

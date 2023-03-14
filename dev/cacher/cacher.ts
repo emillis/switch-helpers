@@ -214,13 +214,11 @@ export class CacheManager {
 //======[TESTING]================================================================================================
 
 // const Manager = new CacheManager("D:\\Test\\Cache Root Location");
-
 // const cache = Manager.getOrInitiateCache("meow3");
-
 // console.log(cache.addFile(
 //     "C:\\Users\\service_switch\\Desktop\\hellox.pdf",
 //     {"holla2": "asd1"},
-//     ["123", "321"],
+//     ["aaa", "bbb"],
 //     {overwrite: true}
 // ));
 // cache.addMetadataToFile(`hellox.pdf`, {"bla1": "alb1"})
