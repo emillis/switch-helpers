@@ -95,7 +95,7 @@ export class PropertyManager {
     async getArrayProperty(tag: string): Promise<string[] | undefined> {
         let val = await this.getProperty(tag);
 
-        if (val === undefined) return undefined
+        if (val === undefined || val === "") return undefined;
 
         if (!Array.isArray(val)) val = [val]
 

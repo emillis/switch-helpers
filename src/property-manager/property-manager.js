@@ -85,7 +85,7 @@ class PropertyManager {
     }
     async getArrayProperty(tag) {
         let val = await this.getProperty(tag);
-        if (val === undefined)
+        if (val === undefined || val === "")
             return undefined;
         if (!Array.isArray(val))
             val = [val];
