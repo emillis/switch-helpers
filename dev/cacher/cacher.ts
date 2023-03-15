@@ -73,6 +73,23 @@ export class Cache {
         }
         return results
     }
+    private removeFileNoSaving(name: string): removeFileStatus {
+        try {
+            const file = this.statsFile.getFile(name);
+            if (!file) return removeFileStatus.FileDoesntExist
+            const fullPath = path.join(this.cacheLocation, name);
+
+            for (const groupName of file.getGroups()) {this.statsFile.removeGroup(name, groupName);}
+            for (const key of Object.keys(file.getAllMetadata() || {})) {this.statsFile.removeMetadata(name, key)}
+
+            this.statsFile.removeFile(name);
+            fs.unlinkSync(fullPath)
+        } catch (e) {
+            return removeFileStatus.Unknown
+        }
+
+        return removeFileStatus.Ok
+    }
 
     addFile(location: string, metadata?: {[p:string]: string}, belongsToGroups: string[] = [], options?: cacheAddFileOptions): addFileStatus{
         options = makeCacheAddFileOptionsReasonable(options);
@@ -105,27 +122,29 @@ export class Cache {
     }
 
     removeFile(name: string): removeFileStatus {
-        try {
-            const fullPath = path.join(this.cacheLocation, name);
-
-            if (!this.statsFile.getFile(name)) return removeFileStatus.FileDoesntExist
-
-            fs.unlinkSync(fullPath)
-        } catch (e) {
-            return removeFileStatus.Unknown
-        }
-
-        this.statsFile.removeFile(name);
+        const status = this.removeFileNoSaving(name);
         this.statsFile.saveFile();
-        return removeFileStatus.Ok
+        return status;
+    }
+    removeFiles(...names: string[]): {[name: string]: removeFileStatus} {
+        let results: {[name: string]: removeFileStatus} = {};
+
+        for (const name of names || []) {results[name] = this.removeFileNoSaving(name);}
+        this.statsFile.saveFile()
+
+        return results
     }
     removeMetadata(fileName: string, key: string) {
-        this.statsFile.removeMetadata(fileName, key);
-        this.statsFile.saveFile();
+        try {
+            this.statsFile.removeMetadata(fileName, key);
+            this.statsFile.saveFile();
+        } catch {}
     }
     removeGroup(fileName: string, group_name: string) {
-        this.statsFile.removeGroup(fileName, group_name);
-        this.statsFile.saveFile();
+        try {
+            this.statsFile.removeGroup(fileName, group_name);
+            this.statsFile.saveFile();
+        } catch {}
     }
 
     getFiles(name: string): fileList {

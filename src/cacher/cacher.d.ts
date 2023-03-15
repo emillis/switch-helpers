@@ -45,6 +45,7 @@ export declare class Cache {
     private statsFileExist;
     private createStatsFile;
     private parseFileManagers;
+    private removeFileNoSaving;
     addFile(location: string, metadata?: {
         [p: string]: string;
     }, belongsToGroups?: string[], options?: cacheAddFileOptions): addFileStatus;
@@ -53,6 +54,9 @@ export declare class Cache {
     }): void;
     addFileToGroup(fileName: string, groups: string[]): void;
     removeFile(name: string): removeFileStatus;
+    removeFiles(...names: string[]): {
+        [name: string]: removeFileStatus;
+    };
     removeMetadata(fileName: string, key: string): void;
     removeGroup(fileName: string, group_name: string): void;
     getFiles(name: string): fileList;
