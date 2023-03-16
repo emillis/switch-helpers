@@ -77,7 +77,7 @@ export class Zip {
     }
 
     //This method generates the archive with all the files that were added.
-    createArchive(options?: compressionOptions): string {
+    async createArchive(options?: compressionOptions): Promise<string> {
         if (!this.initiated) this.init();
         this.checkIfInitiated();
         const o = makeCompressionOptionsReasonable(options);
@@ -115,11 +115,11 @@ export class Zip {
 
             console.log(`Writing: "${name}"`);
 
-            this.archive?.append(fs.createReadStream(fileLoc, "utf-8"), {name: `${name}${parsed.ext}`})
+            this.archive?.file(fileLoc, {name: `${name}${parsed.ext}`})
             namesAlreadyWritten[name] = true;
         }
 
-        this.archive?.finalize()
+        await this.archive?.finalize()
         this.archiveCreated = true;
         return this.zipLocation
     }
@@ -147,14 +147,16 @@ export class Zip {
     }
 }
 
-// const z = new Zip({compressionLevel: 0, tmpLocation: "D:\\Switch Scripts\\_tmp_auto_removal_72h"})
-//
-// z.addFiles(`D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-4GLMMLO4QC43Z0ADV9Y9YFF0IAFTIH-GKR7HBDFRZGO1RLGADJ8MU8FAML4AQ.html`)
-// z.addFiles(
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-DFJKMZBHWQRXRLWEHVFJZP7JOFAJXC-UXACAI7RDCU1V8V1Y2VCXMQKXAQJQM.html`
-// )
-//
-// console.log(`New zip archive created at: "${z.createArchive({randomizeNamesInArchive: false, failIfFileMissing: true})}"`);
+const z = new Zip({compressionLevel: 0, tmpLocation: "D:\\Switch Scripts\\_tmp_auto_removal_72h"})
+
+z.addFiles(`D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-4GLMMLO4QC43Z0ADV9Y9YFF0IAFTIH-GKR7HBDFRZGO1RLGADJ8MU8FAML4AQ.html`)
+z.addFiles(
+    `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
+    `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
+    `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
+    `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-DFJKMZBHWQRXRLWEHVFJZP7JOFAJXC-UXACAI7RDCU1V8V1Y2VCXMQKXAQJQM.html`
+)
+
+z.createArchive({randomizeNamesInArchive: false, failIfFileMissing: true}).then(r=>{
+    console.log(`New zip archive created at: "${r}"`);
+})

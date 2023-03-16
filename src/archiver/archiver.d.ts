@@ -19,7 +19,7 @@ export declare class Zip {
     private checkIfInitiated;
     private init;
     getPotentialArchiveSizeInBytes(): number;
-    createArchive(options?: compressionOptions): string;
+    createArchive(options?: compressionOptions): Promise<string>;
     getArchiveLocation(): string | undefined;
     addFiles(...files: string[]): void;
     constructor(options?: zipperOptions);
