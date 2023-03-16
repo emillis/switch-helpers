@@ -74,20 +74,16 @@ export class PropertyManager {
         if (val.toLowerCase() === "no") return false;
         return !!val;
     }
-    async getPropertyFromList<T>(listObject: T, tag: string, options?: getPropertyFromListOptions): Promise<T | undefined> {
+    async getPropertyFromList<T>(listObject: T, tag: string, options?: getPropertyFromListOptions): Promise<any | undefined> {
         options = makeGetPropertyFromListOptionsReasonable(options);
         if (typeof listObject !== "object") throw `Value supplied is not an object!`;
-        let tagVal = await this.getStringProperty(tag) || "";
-        if (options.caseSensitive !== true) tagVal = tagVal.toLowerCase();
+        let tagVal = await this.getStringProperty(tag);
+        if (tagVal === undefined) return undefined;
+        if (options.caseSensitive !== true) tagVal = (tagVal || "").toLowerCase();
 
-        const myEnum = <{[key: string]: string}><unknown>listObject
-
-        for (const key of Object.keys(myEnum)) {
-            const val = options.caseSensitive === true ? `${myEnum[key]}` : `${myEnum[key]}`.toLowerCase();
-
-            if (options.partialMatch === false ? (val !== tagVal) : (val.search(tagVal) === -1)) continue;
-
-            return <T><unknown>myEnum[key]
+        for (let val of Object.values(listObject)) {
+            val = options.caseSensitive ? `${val}` : `${val}`.toLowerCase();
+            if (!options.partialMatch ? (tagVal === val) : (val.search(tagVal) === -1)) return val;
         }
 
         return undefined
