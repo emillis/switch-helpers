@@ -243,7 +243,7 @@ class FilesManager {
     matchFiles(val) {
         let results = [];
         for (const fm of this.fileManagers) {
-            if (fm.getName().search(val) === -1 && fm.getName() !== val)
+            if (fm.getName().indexOf(val) === -1)
                 continue;
             results.push(fm.getName());
         }

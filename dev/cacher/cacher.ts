@@ -276,9 +276,9 @@ export class CacheManager {
 
 //======[TESTING]================================================================================================
 
-// const Manager = new CacheManager("D:\\Test\\Cache Root Location");
-// const cache = Manager.getOrInitiateCache("meow3");
-// for (let i =1; i < 5; i++) {
+const Manager = new CacheManager("D:\\Test\\Cache Root Location");
+const cache = Manager.getOrInitiateCache("meow3");
+// for (let i =1; i <= 7; i++) {
 //     console.log(cache.addFile(
 //         `C:\\Users\\service_switch\\Desktop\\Sample Artworks\\hello (${i}).pdf`,
 //         {"holla2": "asd1"},
@@ -296,6 +296,7 @@ export class CacheManager {
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
 // console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
+console.log(cache.getFilesWithFilter("(4).pdf", {inGroups: [], hasMetadata: {}}));
 // console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));
 
 

@@ -254,7 +254,7 @@ export class FilesManager {
         let results: string[] = [];
 
         for (const fm of this.fileManagers) {
-            if (fm.getName().search(val) === -1 && fm.getName() !== val) continue;
+            if (fm.getName().indexOf(val) === -1) continue;
 
             results.push(fm.getName())
         }
