@@ -152,6 +152,8 @@ class FileManager {
         return this.file.groups.includes(`${group_name}`);
     }
     addToGroup(group_name) {
+        if (!group_name)
+            return;
         if (this.inGroup(group_name))
             return;
         this.file.groups.push(`${group_name}`);
@@ -169,6 +171,8 @@ class FileManager {
         return this.file.metadata[`${key}`];
     }
     setMetadata(key, values) {
+        if (!key)
+            return;
         this.file.metadata[`${key}`] = `${values}`;
     }
     setMetadataFromObject(metadata) {
@@ -270,12 +274,12 @@ class StatsFile {
         return f;
     }
     addToMetadata(fileName, metadata) {
-        for (const key of Object.keys(metadata || {})) {
+        for (const key of Object.keys(metadata || {}).filter(v => v !== undefined && v !== "")) {
             this.MetadataManager.add(key, metadata[key], fileName);
         }
     }
     addToGroups(fileName, groups) {
-        for (const g of groups || []) {
+        for (const g of (groups || []).filter(v => v !== undefined && v !== "")) {
             this.GroupsManager.addToGroup(`${g}`, fileName);
         }
     }

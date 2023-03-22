@@ -165,6 +165,7 @@ export class FileManager {
         return this.file.groups.includes(`${group_name}`)
     }
     addToGroup(group_name: string) {
+        if (!group_name) return;
         if (this.inGroup(group_name)) return;
         this.file.groups.push(`${group_name}`)
     }
@@ -183,6 +184,7 @@ export class FileManager {
         return this.file.metadata[`${key}`]
     }
     setMetadata(key: string, values: string) {
+        if (!key) return;
         this.file.metadata[`${key}`] = `${values}`
     }
     setMetadataFromObject(metadata: {[p: string]: string}) {
@@ -298,10 +300,10 @@ export class StatsFile {
         return f
     }
     private addToMetadata(fileName: string, metadata: {[p: string]: string}) {
-        for (const key of Object.keys(metadata || {})) {this.MetadataManager.add(key, metadata[key], fileName)}
+        for (const key of Object.keys(metadata || {}).filter(v=>v!==undefined&&v!=="")) {this.MetadataManager.add(key, metadata[key], fileName)}
     }
     private addToGroups(fileName: string, groups: string[]) {
-        for (const g of groups || []) {this.GroupsManager.addToGroup(`${g}`, fileName)}
+        for (const g of (groups || []).filter(v=>v!==undefined&&v!=="")) {this.GroupsManager.addToGroup(`${g}`, fileName)}
     }
 
     getFile(name: string): FileManager | undefined {
