@@ -161,7 +161,7 @@ class Cache {
         let results = { count: 0, names: [], moreInfo: {} };
         for (const fm of this.statsFile.matchFiles(name)) {
             let inGroups = true;
-            for (const g of (filters.inGroups || [])) {
+            for (const g of (filters.inGroups || []).filter(v => v !== undefined && v !== "")) {
                 if (fm.inGroup(g))
                     continue;
                 inGroups = false;
@@ -170,7 +170,7 @@ class Cache {
             if (!inGroups)
                 continue;
             let hasMetadata = true;
-            for (const key of Object.keys(filters.hasMetadata || {})) {
+            for (const key of Object.keys(filters.hasMetadata || {}).filter(v => v !== undefined && v !== "")) {
                 const val = (filters.hasMetadata || {})[key];
                 const mVal = `${fm.getMetadata(key)}`;
                 if (mVal === undefined) {
