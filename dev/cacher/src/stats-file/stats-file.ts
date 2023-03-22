@@ -5,9 +5,7 @@ import * as path from "path";
 
 export type groups = {
     ids: string[]
-    files: {
-        [p:string]: string[]
-    }
+    files: {[groupId:string]: string[]}
 }
 
 export class GroupsManager {
@@ -48,19 +46,17 @@ export class GroupsManager {
     removeFromGroup(group_name: string, fileName: string) {
         group_name = `${group_name}`;
 
-        let i = this.groups.ids.indexOf(group_name);
-        if (i < 0) return
-
-        this.groups.ids.splice(i, 1);
-
         const grp = this.groups.files[group_name];
         if (!grp || !Array.isArray(grp)) return
 
-        i = grp.indexOf(fileName)
+        let i = grp.indexOf(fileName)
+        if (i >= 0) grp.splice(i, 1);
 
-        if (i < 0) return;
-
-        grp.splice(i, 1)
+        if (!grp.length) {
+            let i = this.groups.ids.indexOf(group_name);
+            if (i >= 0) this.groups.ids.splice(i, 1);
+            delete this.groups.files[group_name];
+        }
     }
 
     constructor(groupJson: any) {
@@ -92,7 +88,8 @@ export class MetadataManager {
         (this.metadata[key] = this.metadata[key] || {})[fileName] = value;
     }
     remove(key: string, fileName: string) {
-        delete (this.metadata[key] || {})[fileName]
+        delete this.metadata[key]?.[fileName]
+        if (!Object.values(this.metadata[key]).length) delete this.metadata[key]
     }
     getValue(key: string, fileName: string): string | undefined {
         return (this.metadata[key] || {})[fileName]
@@ -257,7 +254,7 @@ export class FilesManager {
         let results: string[] = [];
 
         for (const fm of this.fileManagers) {
-            if (fm.getName().search(val) === -1) continue;
+            if (fm.getName().search(val) === -1 && fm.getName() !== val) continue;
 
             results.push(fm.getName())
         }
@@ -390,7 +387,14 @@ export class StatsFile {
     }
 
     removeFile(name: string) {
-        this.FilesManager.removeFile(`${name}`.toLowerCase())
+        name = `${name}`.toLowerCase();
+        const file = this.FilesManager.getFile(name);
+        if (!file) return;
+
+        for (const groupName of file.getGroups()) this.GroupsManager.removeFromGroup(groupName, name)
+        for (const metadataKey of Object.keys(file.getAllMetadata() || {})) this.MetadataManager.remove(metadataKey, name)
+
+        this.FilesManager.removeFile(name)
     }
     removeMetadata(fileName: string, key: string) {
         this.MetadataManager.remove(key, fileName);

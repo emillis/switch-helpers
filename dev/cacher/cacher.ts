@@ -75,15 +75,9 @@ export class Cache {
     }
     private removeFileNoSaving(name: string): removeFileStatus {
         try {
-            const file = this.statsFile.getFile(name);
-            if (!file) return removeFileStatus.FileDoesntExist
-            const fullPath = path.join(this.cacheLocation, name);
-
-            for (const groupName of file.getGroups()) {this.statsFile.removeGroup(name, groupName);}
-            for (const key of Object.keys(file.getAllMetadata() || {})) {this.statsFile.removeMetadata(name, key)}
-
+            if (!this.statsFile.getFile(name)) return removeFileStatus.FileDoesntExist
             this.statsFile.removeFile(name);
-            fs.unlinkSync(fullPath)
+            fs.unlinkSync(path.join(this.cacheLocation, name))
         } catch (e) {
             return removeFileStatus.Unknown
         }
@@ -104,7 +98,6 @@ export class Cache {
 
             fs.copyFileSync(location, path.join(this.cacheLocation, fileName))
         } catch (e) {
-            console.log(`${e}`);
             return addFileStatus.Unknown
         }
 
@@ -129,7 +122,7 @@ export class Cache {
     removeFiles(...names: string[]): {[name: string]: removeFileStatus} {
         let results: {[name: string]: removeFileStatus} = {};
 
-        for (const name of names || []) {results[name] = this.removeFileNoSaving(name);}
+        for (const name of names || []) results[name] = this.removeFileNoSaving(name);
         this.statsFile.saveFile()
 
         return results
@@ -163,6 +156,7 @@ export class Cache {
         return results
     }
     getFilesWithFilter(name: string, filters?: filters): fileList {
+        name = `${name}`.toLowerCase();
         filters = makeFiltersReasonable(filters);
         let results: fileList = {count: 0, names: [], moreInfo: {}}
 
@@ -193,11 +187,8 @@ export class Cache {
 
             results.count++;
 
-            const name = fm.getName();
-            const loc = fm.getLocation();
-
-            results.names.push(name);
-            results.moreInfo[name] = {dir: loc, pathToFile: path.join(loc, name)}
+            results.names.push(fm.getName());
+            results.moreInfo[fm.getName()] = {dir: fm.getLocation(), pathToFile: path.join(fm.getLocation(), fm.getName())}
         }
 
         return results
@@ -287,22 +278,25 @@ export class CacheManager {
 
 // const Manager = new CacheManager("D:\\Test\\Cache Root Location");
 // const cache = Manager.getOrInitiateCache("meow3");
-// console.log(cache.addFile(
-//     "C:\\Users\\service_switch\\Desktop\\hellox.pdf",
-//     {"holla2": "asd1"},
-//     ["aaa", "bbb"],
-//     {overwrite: true}
-// ));
+// for (let i =1; i < 5; i++) {
+//     console.log(cache.addFile(
+//         `C:\\Users\\service_switch\\Desktop\\Sample Artworks\\hello (${i}).pdf`,
+//         {"holla2": "asd1"},
+//         ["aaa", "bbb"],
+//         {overwrite: true}
+//     ));
+// }
 // cache.addMetadataToFile(`hellox.pdf`, {"bla1": "alb1"})
 // cache.addFileToGroup("binder1.pdf", ["qwe", "rty"])
 // console.log(cache.addFile("C:\\Users\\service_switch\\Desktop\\Binder1.pdf"));
-// console.log(cache.removeFile("hellox.pdf"));
+// console.log(cache.removeFile(".pdf"));
 // console.log(cache.getFiles(".pdf"));
 // console.log(cache.getFilesInGroup("rty"));
 // console.log(cache.getMetadata("hellox.pdf", "holla"));
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
-// console.log(cache.getFilesWithFilter(".pdf", {inGroups: ["123", "aaa"], hasMetadata: {"holla2": "asd1"}}));
+// console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
+// console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));
 
 
 

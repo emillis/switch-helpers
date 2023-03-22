@@ -1,7 +1,7 @@
 export type groups = {
     ids: string[];
     files: {
-        [p: string]: string[];
+        [groupId: string]: string[];
     };
 };
 export declare class GroupsManager {

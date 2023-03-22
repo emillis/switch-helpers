@@ -6,8 +6,8 @@ export declare const fileExistOptions: {
     readonly addDateTimeSuffix: "addDateTimeSuffix";
     readonly fail: "fail";
 };
-export type fileExistOptions = typeof fileExistOptions[keyof typeof fileExistOptions];
-export type options = {
+export declare type fileExistOptions = typeof fileExistOptions[keyof typeof fileExistOptions];
+export declare type options = {
     createFoldersRecursively?: boolean;
     ifFileExist?: fileExistOptions;
     versionNumberPrefix?: string;
