@@ -88,14 +88,22 @@ export class PropertyManager {
 
         return undefined
     }
-    async getArrayProperty(tag: string): Promise<string[] | undefined> {
-        let val = await this.getProperty(tag);
+    async getArrayProperty(tag: string, separator?: string): Promise<string[] | undefined> {
+        let values = await this.getProperty(tag);
 
-        if (val === undefined || val === "") return undefined;
+        if (values === undefined || values === "") return undefined;
 
-        if (!Array.isArray(val)) val = [val]
+        if (!Array.isArray(values)) values = [values]
 
-        return val
+        if (separator !== undefined) {
+            let results: string[] = [];
+
+            for (const value of values) results.push(...value.split(separator))
+
+            values = results
+        }
+
+        return values
     }
 
     constructor(flowElement: FlowElement, options?: propertyManagerOptions) {

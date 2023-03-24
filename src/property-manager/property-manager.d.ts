@@ -15,6 +15,6 @@ export declare class PropertyManager {
     getNumberProperty(tag: string): Promise<number | undefined>;
     getBooleanProperty(tag: string): Promise<boolean | undefined>;
     getPropertyFromList<T>(listObject: T, tag: string, options?: getPropertyFromListOptions): Promise<any | undefined>;
-    getArrayProperty(tag: string): Promise<string[] | undefined>;
+    getArrayProperty(tag: string, separator?: string): Promise<string[] | undefined>;
     constructor(flowElement: FlowElement, options?: propertyManagerOptions);
 }

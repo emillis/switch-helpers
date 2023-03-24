@@ -83,13 +83,19 @@ class PropertyManager {
         }
         return undefined;
     }
-    async getArrayProperty(tag) {
-        let val = await this.getProperty(tag);
-        if (val === undefined || val === "")
+    async getArrayProperty(tag, separator) {
+        let values = await this.getProperty(tag);
+        if (values === undefined || values === "")
             return undefined;
-        if (!Array.isArray(val))
-            val = [val];
-        return val;
+        if (!Array.isArray(values))
+            values = [values];
+        if (separator !== undefined) {
+            let results = [];
+            for (const value of values)
+                results.push(...value.split(separator));
+            values = results;
+        }
+        return values;
     }
     constructor(flowElement, options) {
         this.flowElement = flowElement;
