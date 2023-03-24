@@ -32,6 +32,8 @@ exports.addFileStatus = { Ok: "Ok", FileAlreadyExists: "FileAlreadyExists", Unkn
 exports.removeFileStatus = { Ok: "Ok", FileDoesntExist: "FileDoesntExist", Unknown: "Unknown" };
 function makeFiltersReasonable(filters) {
     const f = filters || {};
+    if (f.names === undefined)
+        f.names = [];
     if (f.inGroups === undefined)
         f.inGroups = [];
     if (f.hasMetadata === undefined)
@@ -146,38 +148,52 @@ class Cache {
         }
         return results;
     }
-    getFilesWithFilter(name, filters) {
-        name = `${name}`.toLowerCase();
-        filters = makeFiltersReasonable(filters);
+    getFilesWithFilter(filters) {
         let results = { count: 0, names: [], moreInfo: {} };
-        for (const fm of this.statsFile.matchFiles(name)) {
-            let inGroups = true;
-            for (const g of (filters.inGroups || []).filter(v => v !== undefined && v !== "")) {
-                if (fm.inGroup(g))
-                    continue;
-                inGroups = false;
-                break;
-            }
-            if (!inGroups)
-                continue;
-            let hasMetadata = true;
-            for (const key of Object.keys(filters.hasMetadata || {}).filter(v => v !== undefined && v !== "")) {
-                const val = (filters.hasMetadata || {})[key];
-                const mVal = `${fm.getMetadata(key)}`;
-                if (mVal === undefined) {
-                    hasMetadata = false;
+        filters = makeFiltersReasonable(filters);
+        filters.names?.map(v => `${v}`.toLowerCase());
+        for (const f of this.statsFile.getAllFiles()) {
+            //Checking if names match
+            if (filters.names?.length) {
+                let matches = false;
+                for (const name of filters.names) {
+                    if (f.getName().indexOf(name) === -1)
+                        continue;
+                    matches = true;
                     break;
                 }
-                if (mVal === val)
+                if (!matches)
                     continue;
-                hasMetadata = false;
-                break;
             }
-            if (!hasMetadata)
-                continue;
+            //Checking if file is in group
+            if (filters.inGroups?.length) {
+                let matches = false;
+                for (const groupName of filters.inGroups) {
+                    if (!f.inGroup(groupName))
+                        continue;
+                    matches = true;
+                    break;
+                }
+                if (!matches)
+                    continue;
+            }
+            //Checking if file has metadata
+            const mKeys = Object.keys(filters.hasMetadata || {});
+            if (filters.hasMetadata && mKeys.length) {
+                let matches = false;
+                for (const key of mKeys) {
+                    const savedMetadataValue = f.getMetadata(key);
+                    if (savedMetadataValue === undefined || savedMetadataValue !== filters.hasMetadata[key])
+                        continue;
+                    matches = true;
+                    break;
+                }
+                if (!matches)
+                    continue;
+            }
             results.count++;
-            results.names.push(fm.getName());
-            results.moreInfo[fm.getName()] = { dir: fm.getLocation(), pathToFile: path.join(fm.getLocation(), fm.getName()) };
+            results.names.push(f.getName());
+            results.moreInfo[f.getName()] = { dir: f.getLocation(), pathToFile: path.join(f.getLocation(), f.getName()) };
         }
         return results;
     }
@@ -280,5 +296,5 @@ exports.CacheManager = CacheManager;
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
 // console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
-// console.log(cache.getFilesWithFilter("(4).pdf", {inGroups: [], hasMetadata: {}}));
+// console.log(cache.getFilesWithFilter({names: [], inGroups: [], hasMetadata: {}}));
 // console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));

@@ -64,6 +64,7 @@ export declare class FilesManager {
     private readonly files;
     private readonly fileManagers;
     private readonly storageRootLocation;
+    getAllFiles(): FileManager[];
     getFile(name: string): FileManager | undefined;
     removeFile(name: string): void;
     addFile(name: string, metadata?: {
@@ -86,6 +87,7 @@ export declare class StatsFile {
     private checkStatsFile;
     private addToMetadata;
     private addToGroups;
+    getAllFiles(): FileManager[];
     getFile(name: string): FileManager | undefined;
     getGroup(group_name: string): FileManager[] | undefined;
     getMetadata(fileName: string, metadata_key: string): string | undefined;

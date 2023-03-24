@@ -205,6 +205,11 @@ export class FilesManager {
     private readonly fileManagers: FileManager[] = [];
     private readonly storageRootLocation: string;
 
+    //Returns all files present
+    getAllFiles(): FileManager[] {
+        return this.fileManagers
+    }
+
     //Returns a single FileManger or undefined if the file doesn't exist
     getFile(name: string): FileManager | undefined {
         for (const f of this.fileManagers) {
@@ -303,6 +308,9 @@ export class StatsFile {
         for (const g of (groups || []).filter(v=>v!==undefined&&v!=="")) {this.GroupsManager.addToGroup(`${g}`, fileName)}
     }
 
+    getAllFiles(): FileManager[] {
+        return this.FilesManager.getAllFiles()
+    }
     getFile(name: string): FileManager | undefined {
         name = `${name}`.toLowerCase()
         return this.FilesManager.getFile(name);
