@@ -83,16 +83,16 @@ class PropertyManager {
         }
         return undefined;
     }
-    async getArrayProperty(tag, separator) {
+    async getArrayProperty(tag, options) {
         let values = await this.getProperty(tag);
         if (values === undefined || values === "")
             return undefined;
         if (!Array.isArray(values))
             values = [values];
-        if (separator !== undefined) {
+        if (options && options.separator !== undefined) {
             let results = [];
             for (const value of values)
-                results.push(...value.split(separator));
+                results.push(...value.split(options.separator));
             values = results;
         }
         return values;

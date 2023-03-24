@@ -7,6 +7,10 @@ export type getPropertyFromListOptions = {
     partialMatch?: boolean
 }
 
+export type arrayPropertyOptions = {
+    separator?: string
+}
+
 function makeGetPropertyFromListOptionsReasonable(options?: getPropertyFromListOptions): getPropertyFromListOptions {
     options = options || {
         caseSensitive: true,
@@ -88,17 +92,17 @@ export class PropertyManager {
 
         return undefined
     }
-    async getArrayProperty(tag: string, separator?: string): Promise<string[] | undefined> {
+    async getArrayProperty(tag: string, options?: arrayPropertyOptions): Promise<string[] | undefined> {
         let values = await this.getProperty(tag);
 
         if (values === undefined || values === "") return undefined;
 
         if (!Array.isArray(values)) values = [values]
 
-        if (separator !== undefined) {
+        if (options && options.separator !== undefined) {
             let results: string[] = [];
 
-            for (const value of values) results.push(...value.split(separator))
+            for (const value of values) results.push(...value.split(options.separator))
 
             values = results
         }
