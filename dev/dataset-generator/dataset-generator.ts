@@ -72,7 +72,7 @@ export class DatasetGenerator {
         if (model === allowedDatasetModels.Opaque && typeof data !== "string") throw `When using "Opaque" DatasetModel, expecting to receive data of type "string", got "${typeof data}".`
         if (!datasetName) throw `Dataset name "${datasetName.toString()}" is invalid!`;
 
-        await this.job.getDataset(datasetName, AccessLevel.ReadWrite);
+        await this.job.getDataset(datasetName, EnfocusSwitch.AccessLevel.ReadWrite);
 
         if (options.replaceIfExist) {
             try {
