@@ -19,6 +19,7 @@ export declare const removeFileStatus: {
 export type removeFileStatus = typeof removeFileStatus[keyof typeof removeFileStatus];
 export type cacheAddFileOptions = {
     overwrite?: boolean;
+    newName?: string;
 };
 export type fileList = {
     count: number;

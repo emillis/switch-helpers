@@ -15,6 +15,7 @@ export type removeFileStatus = typeof removeFileStatus[keyof typeof removeFileSt
 
 export type cacheAddFileOptions = {
     overwrite?: boolean
+    newName?: string
 }
 
 export type fileList = {
@@ -98,7 +99,7 @@ export class Cache {
 
             if (this.statsFile.getFile(fileName) && !options.overwrite) {return addFileStatus.FileAlreadyExists}
 
-            fs.copyFileSync(location, path.join(this.cacheLocation, fileName))
+            fs.copyFileSync(location, path.join(this.cacheLocation, options.newName || fileName))
         } catch (e) {
             return addFileStatus.Unknown
         }

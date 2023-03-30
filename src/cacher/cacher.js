@@ -94,7 +94,7 @@ class Cache {
             if (this.statsFile.getFile(fileName) && !options.overwrite) {
                 return exports.addFileStatus.FileAlreadyExists;
             }
-            fs.copyFileSync(location, path.join(this.cacheLocation, fileName));
+            fs.copyFileSync(location, path.join(this.cacheLocation, options.newName || fileName));
         }
         catch (e) {
             return exports.addFileStatus.Unknown;

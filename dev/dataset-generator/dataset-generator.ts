@@ -72,7 +72,13 @@ export class DatasetGenerator {
         if (model === allowedDatasetModels.Opaque && typeof data !== "string") throw `When using "Opaque" DatasetModel, expecting to receive data of type "string", got "${typeof data}".`
         if (!datasetName) throw `Dataset name "${datasetName.toString()}" is invalid!`;
 
-        if (options.replaceIfExist) {try {await this.job.removeDataset(datasetName)} catch {}}
+        await this.job.getDataset(datasetName, AccessLevel.ReadWrite);
+
+        if (options.replaceIfExist) {
+            try {
+                await this.job.removeDataset(datasetName)
+            } catch {}
+        }
 
         if (model === allowedDatasetModels.JSON) {
             this.tmpFileLocations.push(await this.addJsonDataset(datasetName, data))
