@@ -1,9 +1,9 @@
-export declare type zipperOptions = {
+export type zipperOptions = {
     archiveName?: string;
     tmpLocation?: string;
     compressionLevel?: number;
 };
-export declare type compressionOptions = {
+export type compressionOptions = {
     failIfFileMissing?: boolean;
     randomizeNamesInArchive?: boolean;
 };

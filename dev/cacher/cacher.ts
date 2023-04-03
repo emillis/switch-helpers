@@ -28,6 +28,7 @@ export type filters = {
     names?: string[]
     inGroups?: string[],
     hasMetadata?: {[key: string]: string}
+    metadataLogic?: "or" | "and"
 }
 
 function makeFiltersReasonable(filters?: filters): filters {
@@ -36,6 +37,9 @@ function makeFiltersReasonable(filters?: filters): filters {
     if (f.names === undefined) f.names = [];
     if (f.inGroups === undefined) f.inGroups = [];
     if (f.hasMetadata === undefined) f.hasMetadata = {};
+    if (f.metadataLogic === undefined) f.metadataLogic = "and"
+    f.metadataLogic = <"or" | "and">`${f.metadataLogic}`.toLowerCase()
+    if (f.metadataLogic !== "or" && f.metadataLogic !== "and") throw `Invalid metadata logic "${f.metadataLogic}" provided! Allowed values are: "or", "and"`;
 
     return f
 }
@@ -197,7 +201,15 @@ export class Cache {
                 for (const key of mKeys) {
                     const savedMetadataValue = f.getMetadata(key);
 
-                    if (savedMetadataValue !== undefined && savedMetadataValue === filters.hasMetadata[key]) continue;
+                    if (filters.metadataLogic === "or") {
+                        if (savedMetadataValue !== undefined && savedMetadataValue === filters.hasMetadata[key]) {
+                            matches = true
+                            break
+                        }
+                        continue;
+                    } else {
+                        if (savedMetadataValue !== undefined && savedMetadataValue === filters.hasMetadata[key]) continue;
+                    }
 
                     matches = false
                     break
@@ -296,8 +308,8 @@ export class CacheManager {
 
 //======[TESTING]================================================================================================
 
-// const Manager = new CacheManager("D:\\Test\\Cache Root Location");
-// const cache = Manager.getOrInitiateCache("meow3");
+const Manager = new CacheManager("D:\\Test\\Cache Root Location");
+const cache = Manager.getOrInitiateCache("meow3");
 // for (let i =1; i <= 6; i++) {
 //     console.log(cache.addFile(
 //         `C:\\Users\\service_switch\\Desktop\\Sample Artworks\\working-sample (${i}).pdf`,
@@ -316,7 +328,7 @@ export class CacheManager {
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
 // console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
-// console.log(cache.getFilesWithFilter({names: [], inGroups: [], hasMetadata: {"index": `index-3`, "test": `hello`}}));
+console.log(cache.getFilesWithFilter({names: [], inGroups: [], hasMetadata: {"index": `index-3`, "test": `hello`}, metadataLogic: "or"}));
 // console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));
 
 
