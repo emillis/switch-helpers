@@ -12,7 +12,7 @@ export type arrayPropertyOptions = {
 export declare class PropertyManager {
     private readonly flowElement;
     private readonly options;
-    private propertyExists;
+    propertyExists(tag: string): boolean;
     getProperty(tag: string): Promise<string | string[] | undefined>;
     getStringProperty(tag: string): Promise<string | undefined>;
     getNumberProperty(tag: string): Promise<number | undefined>;

@@ -1,9 +1,9 @@
 /// <reference types="switch-scripting" />
-export type pageSetup = {
+export declare type pageSetup = {
     TabTitle: string;
     PageTitle: string;
 };
-export type messages = {
+export declare type messages = {
     Errors: string[];
     Warnings: string[];
     Successes: string[];

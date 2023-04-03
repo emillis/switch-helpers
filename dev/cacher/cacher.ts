@@ -180,11 +180,11 @@ export class Cache {
 
             //Checking if file is in group
             if (filters.inGroups?.length) {
-                let matches = false;
+                let matches = true;
                 for (const groupName of filters.inGroups) {
-                    if (!f.inGroup(groupName)) continue;
+                    if (f.inGroup(groupName)) continue;
 
-                    matches = true;
+                    matches = false;
                     break;
                 }
                 if (!matches) continue;
@@ -193,13 +193,13 @@ export class Cache {
             //Checking if file has metadata
             const mKeys = Object.keys(filters.hasMetadata || {});
             if (filters.hasMetadata && mKeys.length) {
-                let matches = false;
+                let matches = true;
                 for (const key of mKeys) {
                     const savedMetadataValue = f.getMetadata(key);
 
-                    if (savedMetadataValue === undefined || savedMetadataValue !== filters.hasMetadata[key]) continue;
+                    if (savedMetadataValue !== undefined && savedMetadataValue === filters.hasMetadata[key]) continue;
 
-                    matches = true
+                    matches = false
                     break
                 }
                 if (!matches) continue;
@@ -208,6 +208,7 @@ export class Cache {
             results.count++;
             results.names.push(f.getName());
             results.moreInfo[f.getName()] = {dir: f.getLocation(), pathToFile: path.join(f.getLocation(), f.getName())}
+
         }
 
         return results
@@ -297,11 +298,11 @@ export class CacheManager {
 
 // const Manager = new CacheManager("D:\\Test\\Cache Root Location");
 // const cache = Manager.getOrInitiateCache("meow3");
-// for (let i =1; i <= 7; i++) {
+// for (let i =1; i <= 6; i++) {
 //     console.log(cache.addFile(
-//         `C:\\Users\\service_switch\\Desktop\\Sample Artworks\\hello (${i}).pdf`,
-//         {"holla2": "asd1"},
-//         ["aaa", "bbb"],
+//         `C:\\Users\\service_switch\\Desktop\\Sample Artworks\\working-sample (${i}).pdf`,
+//         {"index": `index-${i}`, "test": "hello"},
+//         ["group-x", `group-${i}`],
 //         {overwrite: true}
 //     ));
 // }
@@ -315,7 +316,7 @@ export class CacheManager {
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
 // console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
-// console.log(cache.getFilesWithFilter({names: [], inGroups: [], hasMetadata: {}}));
+// console.log(cache.getFilesWithFilter({names: [], inGroups: [], hasMetadata: {"index": `index-3`, "test": `hello`}}));
 // console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));
 
 

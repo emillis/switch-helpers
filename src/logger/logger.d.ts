@@ -2,8 +2,8 @@ export declare const logFormat: {
     readonly Json: "Json";
     readonly Txt: "Txt";
 };
-export type logFormat = typeof logFormat[keyof typeof logFormat];
-type loggerOptions = {
+export declare type logFormat = typeof logFormat[keyof typeof logFormat];
+declare type loggerOptions = {
     logFormat?: logFormat;
     createLocationIfDoesntExist?: boolean;
     logExt?: string;
