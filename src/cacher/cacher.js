@@ -181,11 +181,12 @@ class Cache {
                 for (const groupName of filters.inGroups) {
                     const inGroup = f.inGroup(groupName);
                     if (filters.groupsLogic === "or") {
-                        if (inGroup) {
-                            matches = true;
-                            break;
+                        if (!inGroup) {
+                            matches = false;
+                            continue;
                         }
-                        continue;
+                        matches = true;
+                        break;
                     }
                     else {
                         if (inGroup)
@@ -325,5 +326,5 @@ exports.CacheManager = CacheManager;
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
 // console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
-// console.log(cache.getFilesWithFilter({names: [], inGroups: ["group-3", "group-x"], hasMetadata: {}, groupsLogic: "and"}));
+// console.log(cache.getFilesWithFilter({names: [], inGroups: ["group-3", "group-5"], hasMetadata: {}, groupsLogic: "or"}));
 // console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));
