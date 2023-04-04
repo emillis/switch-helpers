@@ -41,6 +41,7 @@ function makeFiltersReasonable(filters?: filters): filters {
     if (f.metadataLogic === undefined) f.metadataLogic = "and"
     f.metadataLogic = <"or" | "and">`${f.metadataLogic}`.toLowerCase()
     if (f.metadataLogic !== "or" && f.metadataLogic !== "and") throw `Invalid metadata logic "${f.metadataLogic}" provided! Allowed values are: "or", "and"`;
+    if (f.groupsLogic === undefined) f.groupsLogic = "and"
     f.groupsLogic = <"or" | "and">`${f.groupsLogic}`.toLowerCase()
     if (f.groupsLogic !== "or" && f.groupsLogic !== "and") throw `Invalid groups logic "${f.groupsLogic}" provided! Allowed values are: "or", "and"`;
 
