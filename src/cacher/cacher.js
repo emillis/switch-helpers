@@ -43,6 +43,9 @@ function makeFiltersReasonable(filters) {
     f.metadataLogic = `${f.metadataLogic}`.toLowerCase();
     if (f.metadataLogic !== "or" && f.metadataLogic !== "and")
         throw `Invalid metadata logic "${f.metadataLogic}" provided! Allowed values are: "or", "and"`;
+    f.groupsLogic = `${f.groupsLogic}`.toLowerCase();
+    if (f.groupsLogic !== "or" && f.groupsLogic !== "and")
+        throw `Invalid groups logic "${f.groupsLogic}" provided! Allowed values are: "or", "and"`;
     return f;
 }
 function makeCacheAddFileOptionsReasonable(options) {
@@ -174,8 +177,18 @@ class Cache {
             if (filters.inGroups?.length) {
                 let matches = true;
                 for (const groupName of filters.inGroups) {
-                    if (f.inGroup(groupName))
+                    const inGroup = f.inGroup(groupName);
+                    if (filters.groupsLogic === "or") {
+                        if (inGroup) {
+                            matches = true;
+                            break;
+                        }
                         continue;
+                    }
+                    else {
+                        if (inGroup)
+                            continue;
+                    }
                     matches = false;
                     break;
                 }
@@ -290,8 +303,8 @@ class CacheManager {
 }
 exports.CacheManager = CacheManager;
 //======[TESTING]================================================================================================
-const Manager = new CacheManager("D:\\Test\\Cache Root Location");
-const cache = Manager.getOrInitiateCache("meow3");
+// const Manager = new CacheManager("D:\\Test\\Cache Root Location");
+// const cache = Manager.getOrInitiateCache("meow3");
 // for (let i =1; i <= 6; i++) {
 //     console.log(cache.addFile(
 //         `C:\\Users\\service_switch\\Desktop\\Sample Artworks\\working-sample (${i}).pdf`,
@@ -310,5 +323,5 @@ const cache = Manager.getOrInitiateCache("meow3");
 // console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
 // cache.removeMetadata("hellox.pdf", "holla2");
 // console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
-console.log(cache.getFilesWithFilter({ names: [], inGroups: [], hasMetadata: { "index": `index-3`, "test": `hello` }, metadataLogic: "or" }));
+// console.log(cache.getFilesWithFilter({names: [], inGroups: ["group-3", "group-x"], hasMetadata: {}, groupsLogic: "and"}));
 // console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));
