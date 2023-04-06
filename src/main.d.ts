@@ -11,3 +11,4 @@ export * as DatasetGenerator from "./dataset-generator/dataset-generator";
 export * as Reporter from "./reporter/reporter";
 export * as JobManager from "./job-manager/job-manager";
 export * as Archiver from "./archiver/archiver";
+export * as BasicLogic from "./basic-logic/basic-logic";

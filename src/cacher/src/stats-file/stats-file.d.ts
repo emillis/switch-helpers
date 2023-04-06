@@ -1,4 +1,4 @@
-export declare type groups = {
+export type groups = {
     ids: string[];
     files: {
         [groupId: string]: string[];
@@ -15,7 +15,7 @@ export declare class GroupsManager {
     removeFromGroup(group_name: string, fileName: string): void;
     constructor(groupJson: any);
 }
-export declare type metadata = {
+export type metadata = {
     [p: string]: {
         [p: string]: string;
     };
@@ -31,7 +31,7 @@ export declare class MetadataManager {
     getFileNamesWhereValueMatches(key: string, value: string): string[] | undefined;
     constructor(metadataJson: any);
 }
-export declare type file = {
+export type file = {
     name: string;
     location: string;
     groups: string[];
@@ -73,7 +73,7 @@ export declare class FilesManager {
     matchFiles(val: string): string[];
     constructor(filesJson: any, storageLocation: string);
 }
-export declare type statsFile = {
+export type statsFile = {
     files: file[];
     groups: groups;
     metadata: metadata;
