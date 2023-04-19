@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CsvProcessor = void 0;
 const fs = __importStar(require("fs-extra"));
 const csv_reader_1 = __importDefault(require("csv-reader"));
 const path = __importStar(require("path"));
@@ -106,6 +107,7 @@ class CsvProcessor {
         return this;
     }
 }
+exports.CsvProcessor = CsvProcessor;
 // (new CsvProcessor("C:/Users/service_switch/Desktop/csv-processor-test.csv", { parseNumbers: true, parseBooleans: true, trim: true })).init().then(cp=>{
 //     // console.log(cp.getOriginalCsvFile());
 //     console.log(cp.toObject());

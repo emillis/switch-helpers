@@ -12,7 +12,7 @@ function makeOptionsReasonable(opt?: readingOptions): readingOptions {
     return opt
 }
 
-class CsvProcessor {
+export class CsvProcessor {
     private readonly csvFileLocation: string;
     private readonly options: readingOptions;
     private originalCsvFile: string[][] = [];
