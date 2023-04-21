@@ -109,22 +109,17 @@ class Zip {
             throw `Some of the files requested to be zipped (archived) do not exist! Those are: "${missingFiles.join(`", "`)}"!`;
         for (const fileLoc of existingFiles) {
             const parsed = path.parse(fileLoc);
-            let name = "";
-            if (o.randomizeNamesInArchive) {
+            let name = parsed.base;
+            if (o.randomizeNamesInArchive)
                 name = `${this.nameGenerator.generate()}-${this.nameGenerator.generate()}`;
-            }
-            else {
-                name = `${parsed.name}`;
-            }
             //The following logic makes sure that there are no duplicate file names present
             let tmpName = name;
-            for (let i = 2; namesAlreadyWritten[tmpName]; i++) {
+            for (let i = 1; namesAlreadyWritten[tmpName]; i++) {
                 tmpName = name;
-                // tmpName = `${tmpName}_copy(${i})`
+                tmpName = `${parsed.name}_copy(${i})${parsed.ext}`;
             }
             name = tmpName;
-            // console.log(`Writing: "${name}"`);
-            this.archive?.file(fileLoc, { name: `${name}${parsed.ext}` });
+            this.archive?.file(fileLoc, { name: `${name}` });
             namesAlreadyWritten[name] = true;
         }
         await this.archive?.finalize();
@@ -154,12 +149,12 @@ class Zip {
 }
 exports.Zip = Zip;
 // const z = new Zip({compressionLevel: 0, tmpLocation: "D:\\Switch Scripts\\_tmp_auto_removal_72h"})
-// z.addFiles(`D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-4GLMMLO4QC43Z0ADV9Y9YFF0IAFTIH-GKR7HBDFRZGO1RLGADJ8MU8FAML4AQ.html`)
+//
+// z.addFiles(`D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-DGMGQBBXCPBJZYUQXVKOOXRE97XGT6-3JOYNE0G4JCXQLDQVICJBXSYJYPCGY.html`)
 // z.addFiles(
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
-//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-DFJKMZBHWQRXRLWEHVFJZP7JOFAJXC-UXACAI7RDCU1V8V1Y2VCXMQKXAQJQM.html`
+//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-PFIBIC9JJYQQUCWW5FMBKYYQ6IWNW1-BVVC7PB8YA0KKJWRJY4G86OTEWF2Y8.html`,
+//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-PFIBIC9JJYQQUCWW5FMBKYYQ6IWNW1-BVVC7PB8YA0KKJWRJY4G86OTEWF2Y8.tag`,
+//     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-PFIBIC9JJYQQUCWW5FMBKYYQ6IWNW1-BVVC7PB8YA0KKJWRJY4G86OTEWF2Y8.html`
 // )
 //
 // z.createArchive({randomizeNamesInArchive: false, failIfFileMissing: true}).then(r=>{
