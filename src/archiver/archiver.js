@@ -120,7 +120,7 @@ class Zip {
             let tmpName = name;
             for (let i = 2; namesAlreadyWritten[tmpName]; i++) {
                 tmpName = name;
-                tmpName = `${tmpName}_copy(${i})`;
+                // tmpName = `${tmpName}_copy(${i})`
             }
             name = tmpName;
             // console.log(`Writing: "${name}"`);
@@ -153,7 +153,7 @@ class Zip {
     }
 }
 exports.Zip = Zip;
-const z = new Zip({ compressionLevel: 0, tmpLocation: "D:\\Switch Scripts\\_tmp_auto_removal_72h" });
+// const z = new Zip({compressionLevel: 0, tmpLocation: "D:\\Switch Scripts\\_tmp_auto_removal_72h"})
 // z.addFiles(`D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-4GLMMLO4QC43Z0ADV9Y9YFF0IAFTIH-GKR7HBDFRZGO1RLGADJ8MU8FAML4AQ.html`)
 // z.addFiles(
 //     `D:\\Switch Scripts\\_tmp_auto_removal_72h\\report-326GHYCP6YHZI4UJK17ZQRQGMAEMT2-VPJ3LA6UAN5IYQVBQFWWFPQ0YHJCFU.html`,
