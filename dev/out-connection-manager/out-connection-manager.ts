@@ -92,7 +92,7 @@ export class OutConnectionManager {
                 continue
             }
 
-            await this.sendTo(await job.createChild(await job.get(AccessLevel.ReadOnly)), connection, options)
+            await this.sendTo(await job.createChild(await job.get(EnfocusSwitch.AccessLevel.ReadOnly)), connection, options)
         }
     }
 
