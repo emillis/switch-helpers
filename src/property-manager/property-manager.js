@@ -47,6 +47,12 @@ class PropertyManager {
             return val.join();
         return `${val}`;
     }
+    async getStringPropertyOrFail(tag) {
+        const val = await this.getStringProperty(tag);
+        if (val === undefined)
+            throw `tag "${tag}" has undefined value!`;
+        return val;
+    }
     async getNumberProperty(tag) {
         const val = await this.getProperty(tag);
         if (val === undefined)
@@ -54,6 +60,12 @@ class PropertyManager {
         if (Array.isArray(val))
             return +val.join();
         return +val;
+    }
+    async getNumberPropertyOrFail(tag) {
+        const val = await this.getNumberProperty(tag);
+        if (val === undefined)
+            throw `tag "${tag}" has undefined value!`;
+        return val;
     }
     async getBooleanProperty(tag) {
         const val = await this.getProperty(tag);
@@ -66,6 +78,12 @@ class PropertyManager {
         if (val.toLowerCase() === "no")
             return false;
         return !!val;
+    }
+    async getBooleanPropertyOrFail(tag) {
+        const val = await this.getBooleanProperty(tag);
+        if (val === undefined)
+            throw `tag "${tag}" has undefined value!`;
+        return val;
     }
     async getPropertyFromList(listObject, tag, options) {
         options = makeGetPropertyFromListOptionsReasonable(options);
@@ -84,6 +102,18 @@ class PropertyManager {
         }
         return undefined;
     }
+    async getPropertyFromListOrFail(listObject, tag, options) {
+        const val = await this.getPropertyFromList(listObject, tag, options);
+        try {
+            // @ts-ignore
+            if (val === undefined)
+                throw `tag "${tag}" value "${val}" is not allowed! Allowed values are: "${Object.values(listObject).join(`", "`)}"`;
+        }
+        catch {
+            throw `tag "${tag}" has invalid value "${val}" defined!`;
+        }
+        return val;
+    }
     async getArrayProperty(tag, options) {
         let values = await this.getProperty(tag);
         if (values === undefined || values === "")
@@ -97,6 +127,12 @@ class PropertyManager {
             values = results;
         }
         return values;
+    }
+    async getArrayPropertyOrFail(tag, options) {
+        const val = await this.getArrayProperty(tag, options);
+        if (val === undefined)
+            throw `tag "${tag}" has undefined value!`;
+        return val;
     }
     constructor(flowElement, options) {
         this.flowElement = flowElement;

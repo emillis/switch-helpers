@@ -62,12 +62,26 @@ export class PropertyManager {
         if (Array.isArray(val)) return val.join();
         return `${val}`
     }
+    async getStringPropertyOrFail(tag: string): Promise<string> {
+        const val = await this.getStringProperty(tag)
+
+        if (val === undefined) throw `tag "${tag}" has undefined value!`;
+
+        return val
+    }
     async getNumberProperty(tag: string): Promise<number | undefined> {
         const val = await this.getProperty(tag);
 
         if (val === undefined) return undefined;
         if (Array.isArray(val)) return +val.join();
         return +val
+    }
+    async getNumberPropertyOrFail(tag: string): Promise<number> {
+        const val = await this.getNumberProperty(tag);
+
+        if (val === undefined) throw `tag "${tag}" has undefined value!`
+
+        return val
     }
     async getBooleanProperty(tag: string): Promise<boolean | undefined> {
         const val = await this.getProperty(tag);
@@ -77,6 +91,13 @@ export class PropertyManager {
         if (val.toLowerCase() === "yes") return true;
         if (val.toLowerCase() === "no") return false;
         return !!val;
+    }
+    async getBooleanPropertyOrFail(tag: string): Promise<boolean> {
+        const val = await this.getBooleanProperty(tag);
+
+        if (val === undefined) throw `tag "${tag}" has undefined value!`
+
+        return val
     }
     async getPropertyFromList<T>(listObject: T, tag: string, options?: getPropertyFromListOptions): Promise<any | undefined> {
         options = makeGetPropertyFromListOptionsReasonable(options);
@@ -92,6 +113,18 @@ export class PropertyManager {
         }
 
         return undefined
+    }
+    async getPropertyFromListOrFail<T>(listObject: T, tag: string, options?: getPropertyFromListOptions): Promise<any | undefined> {
+        const val = await this.getPropertyFromList(listObject, tag, options);
+
+        try {
+            // @ts-ignore
+            if (val === undefined) throw `tag "${tag}" value "${val}" is not allowed! Allowed values are: "${Object.values(listObject).join(`", "`)}"`
+        } catch {
+            throw `tag "${tag}" has invalid value "${val}" defined!`
+        }
+
+        return val
     }
     async getArrayProperty(tag: string, options?: arrayPropertyOptions): Promise<string[] | undefined> {
         let values = await this.getProperty(tag);
@@ -109,6 +142,13 @@ export class PropertyManager {
         }
 
         return values
+    }
+    async getArrayPropertyOrFail(tag: string, options?: arrayPropertyOptions): Promise<string[]> {
+        const val = await this.getArrayProperty(tag, options);
+
+        if (val === undefined) throw `tag "${tag}" has undefined value!`
+
+        return val
     }
 
     constructor(flowElement: FlowElement, options?: propertyManagerOptions) {
