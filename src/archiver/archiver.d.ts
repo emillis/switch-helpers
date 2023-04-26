@@ -7,6 +7,9 @@ export type compressionOptions = {
     failIfFileMissing?: boolean;
     randomizeNamesInArchive?: boolean;
 };
+export type addFileOptions = {
+    newName?: string;
+};
 export declare class Zip {
     private readonly name;
     private readonly options;
@@ -21,6 +24,7 @@ export declare class Zip {
     getPotentialArchiveSizeInBytes(): number;
     createArchive(options?: compressionOptions): Promise<string>;
     getArchiveLocation(): string | undefined;
+    addFile(loc: string, options?: addFileOptions): void;
     addFiles(...files: string[]): void;
     constructor(options?: zipperOptions);
 }

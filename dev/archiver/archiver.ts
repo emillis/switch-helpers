@@ -34,6 +34,10 @@ function makeCompressionOptionsReasonable(options?: compressionOptions): compres
     return o
 }
 
+export type addFileOptions = {
+    newName?: string
+}
+
 export class Zip {
     private readonly name: string;
     private readonly options: zipperOptions;
@@ -42,7 +46,7 @@ export class Zip {
     private initiated: boolean = false;
     private archiveCreated: boolean = false;
     private archive: archiver.Archiver | undefined;
-    private filesToArchive: string[] = [];
+    private filesToArchive: {loc: string, newName: string | undefined}[] = [];
 
     //This method throws an error if Zipper hasn't been initiated just yet
     private checkIfInitiated () {
@@ -69,8 +73,8 @@ export class Zip {
         let size: number = 0;
 
         for (const fileLoc of this.filesToArchive) {
-            if (!fs.existsSync(fileLoc)) continue;
-            size += fs.statSync(fileLoc).size
+            if (!fs.existsSync(fileLoc.loc)) continue;
+            size += fs.statSync(fileLoc.loc).size
         }
 
         return size;
@@ -84,20 +88,20 @@ export class Zip {
         let namesAlreadyWritten: {[name: string]: boolean} = {}
 
         //Following logic checks for existing files and adds them to the two arrays accordingly
-        let existingFiles: string[] = [];
-        let missingFiles: string[] = [];
-        for (const filePath of this.filesToArchive) {
-            if (fs.existsSync(filePath)) {
-                existingFiles.push(filePath)
+        let existingFiles: {loc: string, newName: string | undefined}[] = [];
+        let missingFiles: {loc: string, newName: string | undefined}[] = [];
+        for (const fileInfo of this.filesToArchive) {
+            if (fs.existsSync(fileInfo.loc)) {
+                existingFiles.push(fileInfo)
                 continue
             }
-            missingFiles.push(filePath)
+            missingFiles.push(fileInfo)
         }
         if (o.failIfFileMissing && missingFiles.length) throw `Some of the files requested to be zipped (archived) do not exist! Those are: "${missingFiles.join(`", "`)}"!`;
 
-        for (const fileLoc of existingFiles) {
-            const parsed = path.parse(fileLoc)
-            let name: string = parsed.base;
+        for (const fileInfo of existingFiles) {
+            const parsed = path.parse(fileInfo.loc)
+            let name: string = fileInfo.newName || parsed.base;
 
             if (o.randomizeNamesInArchive) name = `${this.nameGenerator.generate()}-${this.nameGenerator.generate()}`;
 
@@ -105,11 +109,11 @@ export class Zip {
             let tmpName = name;
             for (let i = 1; namesAlreadyWritten[tmpName]; i++) {
                 tmpName = name
-                tmpName = `${parsed.name}_copy(${i})${parsed.ext}`
+                tmpName = `${path.parse(name).name}_copy(${i})${parsed.ext}`
             }
             name = tmpName
 
-            this.archive?.file(fileLoc, {name: `${name}`})
+            this.archive?.file(fileInfo.loc, {name: `${name}`})
             namesAlreadyWritten[name] = true;
         }
 
@@ -124,9 +128,15 @@ export class Zip {
         return this.zipLocation
     }
 
+    addFile(loc: string, options?: addFileOptions) {
+        this.filesToArchive.push({loc: loc, newName: options?.newName})
+    }
+
     //files must contain full paths to each file
     addFiles(...files: string[]) {
-        this.filesToArchive.push(...files)
+        for (const file of files) {
+            this.filesToArchive.push({loc: file, newName: undefined})
+        }
     }
 
     constructor(options?: zipperOptions) {

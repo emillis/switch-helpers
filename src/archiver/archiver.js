@@ -82,9 +82,9 @@ class Zip {
     getPotentialArchiveSizeInBytes() {
         let size = 0;
         for (const fileLoc of this.filesToArchive) {
-            if (!fs.existsSync(fileLoc))
+            if (!fs.existsSync(fileLoc.loc))
                 continue;
-            size += fs.statSync(fileLoc).size;
+            size += fs.statSync(fileLoc.loc).size;
         }
         return size;
     }
@@ -98,28 +98,28 @@ class Zip {
         //Following logic checks for existing files and adds them to the two arrays accordingly
         let existingFiles = [];
         let missingFiles = [];
-        for (const filePath of this.filesToArchive) {
-            if (fs.existsSync(filePath)) {
-                existingFiles.push(filePath);
+        for (const fileInfo of this.filesToArchive) {
+            if (fs.existsSync(fileInfo.loc)) {
+                existingFiles.push(fileInfo);
                 continue;
             }
-            missingFiles.push(filePath);
+            missingFiles.push(fileInfo);
         }
         if (o.failIfFileMissing && missingFiles.length)
             throw `Some of the files requested to be zipped (archived) do not exist! Those are: "${missingFiles.join(`", "`)}"!`;
-        for (const fileLoc of existingFiles) {
-            const parsed = path.parse(fileLoc);
-            let name = parsed.base;
+        for (const fileInfo of existingFiles) {
+            const parsed = path.parse(fileInfo.loc);
+            let name = fileInfo.newName || parsed.base;
             if (o.randomizeNamesInArchive)
                 name = `${this.nameGenerator.generate()}-${this.nameGenerator.generate()}`;
             //The following logic makes sure that there are no duplicate file names present
             let tmpName = name;
             for (let i = 1; namesAlreadyWritten[tmpName]; i++) {
                 tmpName = name;
-                tmpName = `${parsed.name}_copy(${i})${parsed.ext}`;
+                tmpName = `${path.parse(name).name}_copy(${i})${parsed.ext}`;
             }
             name = tmpName;
-            this.archive?.file(fileLoc, { name: `${name}` });
+            this.archive?.file(fileInfo.loc, { name: `${name}` });
             namesAlreadyWritten[name] = true;
         }
         await this.archive?.finalize();
@@ -132,9 +132,14 @@ class Zip {
             return undefined;
         return this.zipLocation;
     }
+    addFile(loc, options) {
+        this.filesToArchive.push({ loc: loc, newName: options?.newName });
+    }
     //files must contain full paths to each file
     addFiles(...files) {
-        this.filesToArchive.push(...files);
+        for (const file of files) {
+            this.filesToArchive.push({ loc: file, newName: undefined });
+        }
     }
     constructor(options) {
         this.nameGenerator = new main_1.NameGenerator.AdvancedStringGenerator({ type: "random", charCase: "upperOnly", composition: "alphaNumericOnly", minLen: 30, maxLen: 30 });
