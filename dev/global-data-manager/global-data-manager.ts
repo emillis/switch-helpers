@@ -88,6 +88,7 @@ export class GlobalDataManager<T> {
     private notInitiatedErrMsg: string = `This GlobalDataManager has not yet been initiated! Please run ".init()" async function on GlobalDataManager before calling any other functions in order to resolve this!`;
     private originalGlobalDataObject: {[ID: string]: Entry<T>} = {};
     private globalDataObject: {[ID: string]: Entry<T>} = {};
+    private customMetadata: {[key:string]: any} = {};
 
     getAll(): {[ID: string]: Entry<T>} {
         if (!this.initiated) throw this.notInitiatedErrMsg;
@@ -158,6 +159,25 @@ export class GlobalDataManager<T> {
         return e;
     }
 
+    async addCustomMetadata(key: string, value: any) {
+        this.customMetadata[key] = value
+        await this.switch.setGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, this.customMetadata)
+    }
+    async removeCustomMetadata(...keys: string[]) {
+        for (const key of keys) delete this.customMetadata[key]
+        await this.switch.setGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, this.customMetadata)
+    }
+    getCustomMetadata(key: string): any {
+        return this.customMetadata[key]
+    }
+    getMultipleCustomData(...keys: string[]): {[key: string]: any} {
+        const result: {[key: string]: any} = {};
+
+        for (const key of keys) result[key] = this.getCustomMetadata(key)
+
+        return result
+    }
+
     //Unlocks global data without saving newly added / removed shared data.
     async unlockGlobalData() {
         if (!this.initiated) throw this.notInitiatedErrMsg;
@@ -167,7 +187,7 @@ export class GlobalDataManager<T> {
     //Saves newly added / removed shared data to the global data and unlocks it.
     async saveAndUnlockGlobalData() {
         if (!this.initiated) throw this.notInitiatedErrMsg;
-        await this.switch.setGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, this.globalDataObject)
+        await this.switch.setGlobalData(this.cfg.scope || EnfocusSwitch.Scope.FlowElement, this.cfg.tag, this.globalDataObject)
     }
 
     constructor(s: Switch, cfg: config) {
@@ -183,7 +203,8 @@ export class GlobalDataManager<T> {
     }
 
     async init(): Promise<GlobalDataManager<T>> {
-        const values: {[ID: string]: entry<T>} = await this.switch.getGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, true) || {}
+        const values: {[ID: string]: entry<T>} = await this.switch.getGlobalData(this.cfg.scope || EnfocusSwitch.Scope.FlowElement, this.cfg.tag, true) || {}
+        this.customMetadata = await this.switch.getGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, false)
 
         for (const value of Object.values(values)) {
             const e1 = new Entry<T>(value);

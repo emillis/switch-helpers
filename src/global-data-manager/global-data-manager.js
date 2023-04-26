@@ -71,6 +71,7 @@ class GlobalDataManager {
     notInitiatedErrMsg = `This GlobalDataManager has not yet been initiated! Please run ".init()" async function on GlobalDataManager before calling any other functions in order to resolve this!`;
     originalGlobalDataObject = {};
     globalDataObject = {};
+    customMetadata = {};
     getAll() {
         if (!this.initiated)
             throw this.notInitiatedErrMsg;
@@ -131,6 +132,24 @@ class GlobalDataManager {
         this.globalDataObject[id] = e;
         return e;
     }
+    async addCustomMetadata(key, value) {
+        this.customMetadata[key] = value;
+        await this.switch.setGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, this.customMetadata);
+    }
+    async removeCustomMetadata(...keys) {
+        for (const key of keys)
+            delete this.customMetadata[key];
+        await this.switch.setGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, this.customMetadata);
+    }
+    getCustomMetadata(key) {
+        return this.customMetadata[key];
+    }
+    getMultipleCustomData(...keys) {
+        const result = {};
+        for (const key of keys)
+            result[key] = this.getCustomMetadata(key);
+        return result;
+    }
     //Unlocks global data without saving newly added / removed shared data.
     async unlockGlobalData() {
         if (!this.initiated)
@@ -141,7 +160,7 @@ class GlobalDataManager {
     async saveAndUnlockGlobalData() {
         if (!this.initiated)
             throw this.notInitiatedErrMsg;
-        await this.switch.setGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, this.globalDataObject);
+        await this.switch.setGlobalData(this.cfg.scope || EnfocusSwitch.Scope.FlowElement, this.cfg.tag, this.globalDataObject);
     }
     constructor(s, cfg) {
         this.switch = s;
@@ -155,7 +174,8 @@ class GlobalDataManager {
         });
     }
     async init() {
-        const values = await this.switch.getGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, true) || {};
+        const values = await this.switch.getGlobalData(this.cfg.scope || EnfocusSwitch.Scope.FlowElement, this.cfg.tag, true) || {};
+        this.customMetadata = await this.switch.getGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, false);
         for (const value of Object.values(values)) {
             const e1 = new Entry(value);
             const e2 = new Entry(value);

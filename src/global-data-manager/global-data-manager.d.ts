@@ -1,9 +1,9 @@
 /// <reference types="switch-scripting" />
-export type config = {
+export declare type config = {
     tag: string;
     scope?: Scope;
 };
-export type entry<T> = {
+export declare type entry<T> = {
     _id: string;
     _timeAdded: number;
     _timeModified: number;
@@ -30,6 +30,7 @@ export declare class GlobalDataManager<T> {
     private notInitiatedErrMsg;
     private originalGlobalDataObject;
     private globalDataObject;
+    private customMetadata;
     getAll(): {
         [ID: string]: Entry<T>;
     };
@@ -42,6 +43,12 @@ export declare class GlobalDataManager<T> {
     removeEntries(...ids: string[]): void;
     removeAllEntries(): void;
     addEntry(data: T, id?: string): Entry<T>;
+    addCustomMetadata(key: string, value: any): Promise<void>;
+    removeCustomMetadata(...keys: string[]): Promise<void>;
+    getCustomMetadata(key: string): any;
+    getMultipleCustomData(...keys: string[]): {
+        [key: string]: any;
+    };
     unlockGlobalData(): Promise<void>;
     saveAndUnlockGlobalData(): Promise<void>;
     constructor(s: Switch, cfg: config);
