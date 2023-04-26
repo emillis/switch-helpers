@@ -204,7 +204,7 @@ export class GlobalDataManager<T> {
 
     async init(): Promise<GlobalDataManager<T>> {
         const values: {[ID: string]: entry<T>} = await this.switch.getGlobalData(this.cfg.scope || EnfocusSwitch.Scope.FlowElement, this.cfg.tag, true) || {}
-        this.customMetadata = await this.switch.getGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, false)
+        this.customMetadata = await this.switch.getGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, false) || this.customMetadata
 
         for (const value of Object.values(values)) {
             const e1 = new Entry<T>(value);
