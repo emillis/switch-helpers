@@ -1,6 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OutConnectionManager = void 0;
+function makeSendToAllOnPropertyTagConditionOptionsReasonable(options) {
+    return {
+        newName: options?.newName,
+        sendCopy: options?.sendCopy === undefined ? true : options?.sendCopy
+    };
+}
 class OutConnectionManager {
     flowElement;
     connectionIndex;
@@ -74,11 +80,12 @@ class OutConnectionManager {
     }
     //Sends the job to all connection that have matching tag value with the one provided
     async sendToAllOnPropertyTagCondition(job, tag, tag_value, options) {
+        options = makeSendToAllOnPropertyTagConditionOptionsReasonable(options);
         for (const connection of this.connectionIndex.all) {
             if (!await this.doesTagMatch(connection, tag, tag_value)) {
                 continue;
             }
-            await this.sendTo(await job.createChild(await job.get(EnfocusSwitch.AccessLevel.ReadOnly)), connection, options);
+            await this.sendTo(options.sendCopy ? await job.createChild(await job.get(EnfocusSwitch.AccessLevel.ReadOnly)) : job, connection, { newName: options.newName });
         }
     }
     //flowElement - Switch's FlowElement object to be provided.

@@ -8,6 +8,10 @@ export declare type connIndex = {
 export declare type options = {
     newName?: string;
 };
+export declare type sendToAllOnPropertyTagConditionOptions = {
+    newName?: string;
+    sendCopy?: boolean;
+};
 export declare class OutConnectionManager {
     private readonly flowElement;
     private connectionIndex;
@@ -26,6 +30,6 @@ export declare class OutConnectionManager {
     };
     sendTo(job: Job, connection: Connection, options?: options): Promise<void>;
     sendToOnPropertyTagCondition(job: Job, connection: Connection, tag: string, tag_value: string, options?: options): Promise<void>;
-    sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string, options?: options): Promise<void>;
+    sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string, options?: sendToAllOnPropertyTagConditionOptions): Promise<void>;
     constructor(flowElement: FlowElement);
 }

@@ -7,6 +7,17 @@ export type options = {
     newName?: string
 }
 
+export type sendToAllOnPropertyTagConditionOptions = {
+    newName?: string
+    sendCopy?: boolean
+}
+function makeSendToAllOnPropertyTagConditionOptionsReasonable(options?: sendToAllOnPropertyTagConditionOptions): sendToAllOnPropertyTagConditionOptions {
+    return {
+        newName: options?.newName,
+        sendCopy: options?.sendCopy === undefined ? true : options?.sendCopy
+    }
+}
+
 export class OutConnectionManager {
     private readonly flowElement: FlowElement;
     private connectionIndex: connIndex;
@@ -86,13 +97,15 @@ export class OutConnectionManager {
     }
 
     //Sends the job to all connection that have matching tag value with the one provided
-    async sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string, options?: options) {
+    async sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string, options?: sendToAllOnPropertyTagConditionOptions) {
+        options = makeSendToAllOnPropertyTagConditionOptionsReasonable(options)
+
         for (const connection of this.connectionIndex.all) {
             if (!await this.doesTagMatch(connection, tag, tag_value)) {
                 continue
             }
 
-            await this.sendTo(await job.createChild(await job.get(EnfocusSwitch.AccessLevel.ReadOnly)), connection, options)
+            await this.sendTo(options.sendCopy ? await job.createChild(await job.get(EnfocusSwitch.AccessLevel.ReadOnly)) : job, connection, {newName: options.newName})
         }
     }
 
