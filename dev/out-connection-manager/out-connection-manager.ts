@@ -97,12 +97,15 @@ export class OutConnectionManager {
     }
 
     //Sends the job to all connection that have matching tag value with the one provided
-    async sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string, options?: sendToAllOnPropertyTagConditionOptions) {
+    async sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string | string[], options?: sendToAllOnPropertyTagConditionOptions) {
         options = makeSendToAllOnPropertyTagConditionOptionsReasonable(options)
+        const tagValues = Array.isArray(tag_value) ? tag_value : [tag_value]
 
         for (const connection of this.connectionIndex.all) {
-            if (!await this.doesTagMatch(connection, tag, tag_value)) {
-                continue
+            let matches: boolean = false
+            for (const tagVal of tagValues) {
+                matches = await this.doesTagMatch(connection, tag, tagVal);
+                if (matches) break
             }
 
             await this.sendTo(options.sendCopy ? await job.createChild(await job.get(EnfocusSwitch.AccessLevel.ReadOnly)) : job, connection, {newName: options.newName})

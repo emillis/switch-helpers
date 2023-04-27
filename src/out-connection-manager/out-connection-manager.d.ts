@@ -1,14 +1,14 @@
 /// <reference types="switch-scripting" />
-export declare type connIndex = {
+export type connIndex = {
     all: Connection[];
     byName: {
         [p: string]: Connection[];
     };
 };
-export declare type options = {
+export type options = {
     newName?: string;
 };
-export declare type sendToAllOnPropertyTagConditionOptions = {
+export type sendToAllOnPropertyTagConditionOptions = {
     newName?: string;
     sendCopy?: boolean;
 };
@@ -30,6 +30,6 @@ export declare class OutConnectionManager {
     };
     sendTo(job: Job, connection: Connection, options?: options): Promise<void>;
     sendToOnPropertyTagCondition(job: Job, connection: Connection, tag: string, tag_value: string, options?: options): Promise<void>;
-    sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string, options?: sendToAllOnPropertyTagConditionOptions): Promise<void>;
+    sendToAllOnPropertyTagCondition(job: Job, tag: string, tag_value: string | string[], options?: sendToAllOnPropertyTagConditionOptions): Promise<void>;
     constructor(flowElement: FlowElement);
 }
