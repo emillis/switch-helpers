@@ -107,6 +107,7 @@ export class OutConnectionManager {
                 matches = await this.doesTagMatch(connection, tag, tagVal);
                 if (matches) break
             }
+            if (!matches) continue;
 
             await this.sendTo(options.sendCopy ? await job.createChild(await job.get(EnfocusSwitch.AccessLevel.ReadOnly)) : job, connection, {newName: options.newName})
         }
