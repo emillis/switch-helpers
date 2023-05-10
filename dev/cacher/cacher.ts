@@ -103,11 +103,11 @@ export class Cache {
         try {
             if (!location || !fs.existsSync(location)) {return addFileStatus.InputFileNotExist}
 
-            fileName = path.parse(location).base;
+            fileName = options.newName || path.parse(location).base;
 
             if (this.statsFile.getFile(fileName) && !options.overwrite) {return addFileStatus.FileAlreadyExists}
 
-            fs.copyFileSync(location, path.join(this.cacheLocation, options.newName || fileName))
+            fs.copyFileSync(location, path.join(this.cacheLocation, fileName))
         } catch (e) {
             return addFileStatus.Unknown
         }
