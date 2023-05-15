@@ -15,16 +15,16 @@ export declare class Zip {
     private readonly options;
     private readonly zipLocation;
     private readonly nameGenerator;
-    private initiated;
+    private wasInitiated;
     private archiveCreated;
     private archive;
     private filesToArchive;
-    private checkIfInitiated;
-    private init;
+    private initiated;
     getPotentialArchiveSizeInBytes(): number;
     createArchive(options?: compressionOptions): Promise<string>;
     getArchiveLocation(): string | undefined;
     addFile(loc: string, options?: addFileOptions): void;
     addFiles(...files: string[]): void;
     constructor(options?: zipperOptions);
+    private init;
 }

@@ -1,88 +1,131 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GlobalDataManager = exports.Entry = void 0;
-const main_1 = require("../main");
+exports.Entry = void 0;
+const main_1 = require("../../main");
 function makeConfigReasonable(config) {
     config = config || {
         tag: "",
-        scope: Scope.FlowElement
+        scope: Scope.FlowElement,
+        loadJobs: false
     };
     if (!config.tag)
         throw `Invalid global data tag "${config.tag}" provided!`;
     if (config.scope === undefined)
-        config.scope = Scope.FlowElement;
+        config.scope = EnfocusSwitch.Scope.FlowElement;
+    if (config.loadJobs === undefined)
+        config.loadJobs = false;
     return config;
 }
 class Entry {
-    _id;
-    _timeAdded;
-    _timeModified;
-    _data;
+    entry;
+    _job;
     //Returns entry ID
     id(newId) {
         if (newId !== undefined)
-            this._id = `${newId}`;
-        return this._id;
+            this.entry._id = `${newId}`;
+        return this.entry._id;
     }
     //Returns time when the entry was added (timestamp)
     timeAdded(newTime) {
         if (newTime !== undefined)
-            this._timeAdded = newTime;
-        return this._timeAdded;
+            this.entry._timeAdded = newTime;
+        return this.entry._timeAdded;
     }
     //Returns time when the entry was last modified
     timeModified(newTime) {
         if (newTime !== undefined)
-            this._timeModified = newTime;
-        return this._timeModified;
+            this.entry._timeModified = newTime;
+        return this.entry._timeModified;
     }
     //Updates timeModified field with current timestamp
     updateTimeModified() {
-        return this.timeModified(+new Date());
+        return this.timeModified(Date.now());
+    }
+    job(job) {
+        if (job)
+            this._job = job;
+        return this._job;
+    }
+    jobId(newJobId) {
+        if (newJobId !== undefined)
+            this.entry._jobId = newJobId;
+        return this.entry._jobId;
+    }
+    currentJobRetrievalAttempt(newValue) {
+        if (newValue !== undefined)
+            this.entry._currentJobRetrievalAttempt = newValue;
+        return this.entry._currentJobRetrievalAttempt;
+    }
+    jobRetrievalAttempts(newValue) {
+        if (newValue !== undefined)
+            this.entry._jobRetrievalAttempts = newValue;
+        return this.entry._jobRetrievalAttempts;
     }
     //Returns the custom data added by the client
     data(newData) {
         if (newData !== undefined)
-            this._data = newData;
-        return this._data;
+            this.entry._data = newData;
+        return this.entry._data;
     }
     //Returns entry data object
     getEntryDataObject() {
-        return {
-            _id: this._id,
-            _timeAdded: this._timeAdded,
-            _timeModified: this._timeModified,
-            _data: this._data
-        };
+        return this.entry;
     }
-    constructor(e) {
-        this._id = e._id;
-        this._timeAdded = e._timeAdded;
-        this._timeModified = e._timeModified;
-        this._data = e._data;
+    constructor(e, job) {
+        this.entry = e;
+        this.job(job);
     }
 }
 exports.Entry = Entry;
 class GlobalDataManager {
     switch;
-    cfg;
+    flowElement;
+    config;
     randGen;
     initiated = false;
-    notInitiatedErrMsg = `This GlobalDataManager has not yet been initiated! Please run ".init()" async function on GlobalDataManager before calling any other functions in order to resolve this!`;
     originalGlobalDataObject = {};
     globalDataObject = {};
     customMetadata = {};
-    getAll() {
+    isInitiated() {
         if (!this.initiated)
-            throw this.notInitiatedErrMsg;
+            throw `This GlobalDataManager has not yet been initiated! Please run ".init()" async function on GlobalDataManager before calling any other functions in order to resolve this!`;
+    }
+    async loadJobs() {
+        const entries = Object.values(this.globalDataObject);
+        const jobIdsToGet = [];
+        for (const e of entries) {
+            const jid = e.jobId();
+            if (jid)
+                jobIdsToGet.push(jid);
+        }
+        let jobs = [];
+        try {
+            jobs = await this.flowElement.getJobs(jobIdsToGet);
+        }
+        catch { }
+        for (const entry of entries) {
+            let jobAssigned = false;
+            for (const job of jobs) {
+                if (entry.jobId() !== job.getId())
+                    continue;
+                entry.job(job);
+                jobAssigned = true;
+                break;
+            }
+            if (!jobAssigned) {
+            }
+        }
+    }
+    getAll() {
+        this.isInitiated();
         return this.globalDataObject;
     }
     getEntry(id) {
-        if (!this.initiated)
-            throw this.notInitiatedErrMsg;
+        this.isInitiated();
         return this.globalDataObject[id];
     }
     getAllEntryIds() {
+        this.isInitiated();
         try {
             return Object.keys(this.globalDataObject);
         }
@@ -91,8 +134,7 @@ class GlobalDataManager {
         }
     }
     getEntries(ids) {
-        if (!this.initiated)
-            throw this.notInitiatedErrMsg;
+        this.isInitiated();
         let result = {};
         for (const id of ids) {
             result[id] = this.globalDataObject[id];
@@ -100,51 +142,58 @@ class GlobalDataManager {
         return result;
     }
     getAvailableEntries() {
+        this.isInitiated();
         return Object.values(this.globalDataObject);
     }
     removeEntries(...ids) {
-        if (!this.initiated)
-            throw this.notInitiatedErrMsg;
+        this.isInitiated();
         for (const id of ids) {
             delete this.globalDataObject[id];
         }
     }
     removeAllEntries() {
+        this.isInitiated();
         this.globalDataObject = {};
     }
-    addEntry(data, id) {
-        if (!this.initiated)
-            throw this.notInitiatedErrMsg;
-        if (id === undefined) {
+    addEntry(data, options = {}) {
+        this.isInitiated();
+        if (options.id === undefined) {
             let tmpId = this.randGen.generate();
             while (this.globalDataObject[tmpId] !== undefined) {
                 tmpId = this.randGen.generate();
             }
-            id = tmpId;
+            options.id = tmpId;
         }
-        const now = +new Date();
+        const now = Date.now();
         const e = new Entry({
-            _id: id,
+            _id: options.id,
             _timeAdded: now,
             _timeModified: now,
+            _jobId: options.job?.getId(),
+            _currentJobRetrievalAttempt: 0,
+            _jobRetrievalAttempts: options.jobRetrievalCount || 3,
             _data: data
         });
-        this.globalDataObject[id] = e;
+        this.globalDataObject[options.id] = e;
         return e;
     }
     async addCustomMetadata(key, value) {
+        this.isInitiated();
         this.customMetadata[key] = value;
         await this.switch.setGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, this.customMetadata);
     }
     async removeCustomMetadata(...keys) {
+        this.isInitiated();
         for (const key of keys)
             delete this.customMetadata[key];
         await this.switch.setGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, this.customMetadata);
     }
     getCustomMetadata(key) {
+        this.isInitiated();
         return this.customMetadata[key];
     }
     getMultipleCustomData(...keys) {
+        this.isInitiated();
         const result = {};
         for (const key of keys)
             result[key] = this.getCustomMetadata(key);
@@ -152,19 +201,18 @@ class GlobalDataManager {
     }
     //Unlocks global data without saving newly added / removed shared data.
     async unlockGlobalData() {
-        if (!this.initiated)
-            throw this.notInitiatedErrMsg;
-        await this.switch.setGlobalData(this.cfg.scope || Scope.FlowElement, this.cfg.tag, this.originalGlobalDataObject);
+        this.isInitiated();
+        await this.switch.setGlobalData(this.config.scope || Scope.FlowElement, this.config.tag, this.originalGlobalDataObject);
     }
     //Saves newly added / removed shared data to the global data and unlocks it.
     async saveAndUnlockGlobalData() {
-        if (!this.initiated)
-            throw this.notInitiatedErrMsg;
-        await this.switch.setGlobalData(this.cfg.scope || EnfocusSwitch.Scope.FlowElement, this.cfg.tag, this.globalDataObject);
+        this.isInitiated();
+        await this.switch.setGlobalData(this.config.scope || EnfocusSwitch.Scope.FlowElement, this.config.tag, this.globalDataObject);
     }
-    constructor(s, cfg) {
+    constructor(s, flowElement, cfg) {
         this.switch = s;
-        this.cfg = makeConfigReasonable(cfg);
+        this.flowElement = flowElement;
+        this.config = makeConfigReasonable(cfg);
         this.randGen = new main_1.NameGenerator.AdvancedStringGenerator({
             minLen: 20,
             maxLen: 20,
@@ -174,7 +222,7 @@ class GlobalDataManager {
         });
     }
     async init() {
-        const values = await this.switch.getGlobalData(this.cfg.scope || EnfocusSwitch.Scope.FlowElement, this.cfg.tag, true) || {};
+        const values = await this.switch.getGlobalData(this.config.scope || EnfocusSwitch.Scope.FlowElement, this.config.tag, true) || {};
         this.customMetadata = await this.switch.getGlobalData(EnfocusSwitch.Scope.FlowElement, `global-data-manager-custom-metadata`, false) || this.customMetadata;
         for (const value of Object.values(values)) {
             const e1 = new Entry(value);
@@ -186,4 +234,4 @@ class GlobalDataManager {
         return this;
     }
 }
-exports.GlobalDataManager = GlobalDataManager;
+exports.default = GlobalDataManager;

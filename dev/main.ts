@@ -6,10 +6,11 @@ export * as FileSaver from "./file-saver/file-saver";
 export * as Logger from "./logger/logger";
 export * as CacheManager from "./cacher/cacher";
 export * as PropertyManager from "./property-manager/property-manager";
-export * as GlobalDataManager from "./global-data-manager/global-data-manager";
+export * as GlobalDataManager from "./global-data-manager/index-global-data-manager";
 export * as DatasetGenerator from "./dataset-generator/dataset-generator";
 export * as Reporter from "./reporter/reporter";
 export * as JobManager from "./job-manager/job-manager";
 export * as Archiver from "./archiver/archiver";
 export * as BasicLogic from "./basic-logic/basic-logic";
-export * as CsvProcessor from "./csv-processor/csv-processor"
+export * as CsvProcessor from "./csv-processor/csv-processor";
+export * as Mutex from "./mutex/index-mutex";

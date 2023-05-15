@@ -57,29 +57,18 @@ class Zip {
     options;
     zipLocation;
     nameGenerator;
-    initiated = false;
+    wasInitiated = false;
     archiveCreated = false;
     archive;
     filesToArchive = [];
     //This method throws an error if Zipper hasn't been initiated just yet
-    checkIfInitiated() {
-        if (!this.initiated)
+    initiated() {
+        if (!this.wasInitiated)
             throw `Zipper has not yet been initiated! Please run .init() in order to initiate the zipper.`;
-    }
-    //Init method creates all pre-requisites for generating the archive.
-    init() {
-        const w = fs.createWriteStream(this.zipLocation, { encoding: "utf-8" });
-        this.archive = archiver.create(`zip`, { zlib: { level: this.options.compressionLevel } });
-        this.archive.on('warning', function (err) {
-            if (err.code !== 'ENOENT')
-                throw err;
-        });
-        this.archive.on('error', err => { throw err; });
-        this.archive.pipe(w);
-        this.initiated = true;
     }
     //Returns number of bytes of all the files combined that have been added to zipper
     getPotentialArchiveSizeInBytes() {
+        this.initiated();
         let size = 0;
         for (const fileLoc of this.filesToArchive) {
             if (!fs.existsSync(fileLoc.loc))
@@ -90,9 +79,7 @@ class Zip {
     }
     //This method generates the archive with all the files that were added.
     async createArchive(options) {
-        if (!this.initiated)
-            this.init();
-        this.checkIfInitiated();
+        this.initiated();
         const o = makeCompressionOptionsReasonable(options);
         let namesAlreadyWritten = {};
         //Following logic checks for existing files and adds them to the two arrays accordingly
@@ -128,15 +115,18 @@ class Zip {
     }
     //Returns archive location if it has been created and undefined if it hasn't
     getArchiveLocation() {
+        this.initiated();
         if (!this.archiveCreated)
             return undefined;
         return this.zipLocation;
     }
     addFile(loc, options) {
+        this.initiated();
         this.filesToArchive.push({ loc: loc, newName: options?.newName });
     }
     //files must contain full paths to each file
     addFiles(...files) {
+        this.initiated();
         for (const file of files) {
             this.filesToArchive.push({ loc: file, newName: undefined });
         }
@@ -150,6 +140,20 @@ class Zip {
             throw `Zip archive name is not defined. Expected a string, got "${this.options.archiveName}"!`;
         this.name = `${this.options.archiveName}.zip`;
         this.zipLocation = path.join(`${this.options.tmpLocation}`, this.name);
+    }
+    //Init method creates all pre-requisites for generating the archive.
+    init() {
+        if (this.wasInitiated)
+            throw `Method .init(...) has already been called for class "Zip"`;
+        this.wasInitiated = true;
+        const w = fs.createWriteStream(this.zipLocation, { encoding: "utf-8" });
+        this.archive = archiver.create(`zip`, { zlib: { level: this.options.compressionLevel } });
+        this.archive.on('warning', function (err) {
+            if (err.code !== 'ENOENT')
+                throw err;
+        });
+        this.archive.on('error', err => { throw err; });
+        this.archive.pipe(w);
     }
 }
 exports.Zip = Zip;

@@ -25,22 +25,16 @@ export type fileList = {
 }
 
 export type filters = {
-    names?: string[]
+    keywords?: string[]
     inGroups?: string[],
-    hasMetadata?: {[key: string]: string}
-    metadataLogic?: "or" | "and"
     groupsLogic?: "or" | "and"
 }
 
 function makeFiltersReasonable(filters?: filters): filters {
     const f: filters = filters || {}
 
-    if (f.names === undefined) f.names = [];
+    if (f.keywords === undefined) f.keywords = [];
     if (f.inGroups === undefined) f.inGroups = [];
-    if (f.hasMetadata === undefined) f.hasMetadata = {};
-    if (f.metadataLogic === undefined) f.metadataLogic = "and"
-    f.metadataLogic = <"or" | "and">`${f.metadataLogic}`.toLowerCase()
-    if (f.metadataLogic !== "or" && f.metadataLogic !== "and") throw `Invalid metadata logic "${f.metadataLogic}" provided! Allowed values are: "or", "and"`;
     if (f.groupsLogic === undefined) f.groupsLogic = "and"
     f.groupsLogic = <"or" | "and">`${f.groupsLogic}`.toLowerCase()
     if (f.groupsLogic !== "or" && f.groupsLogic !== "and") throw `Invalid groups logic "${f.groupsLogic}" provided! Allowed values are: "or", "and"`;
@@ -55,6 +49,10 @@ function makeCacheAddFileOptionsReasonable(options?: cacheAddFileOptions): cache
     return options
 }
 
+function newFileList(): fileList {
+    return {count: 0, names: [], moreInfo: {}}
+}
+
 export class Cache {
     private readonly rootLocation: string;
     private readonly cacheName: string;
@@ -62,210 +60,114 @@ export class Cache {
     private readonly statsFileLocation: string;
     private readonly statsFile: statsFile.StatsFile;
 
+    //Finds files matching keywords withing the directory
+    private findFiles(keywords: string[], partialMatch: boolean = true, caseSensitive: boolean = false): fileList {
+        const results: fileList = newFileList()
+        if (!caseSensitive) keywords = keywords.map(kw=>kw.toLowerCase())
+
+        const files = fs.readdirSync(this.cacheLocation, {withFileTypes: true})
+            .filter(item=>!item.isDirectory())
+
+        for (const file of files) {
+            let add: boolean = true
+            const fileName = caseSensitive ? file.name : file.name.toLowerCase();
+            for (const keyword of keywords) {
+                if (partialMatch ? fileName.includes(keyword) : fileName === keyword) continue;
+                add = false;
+                break
+            }
+            if (!add) continue;
+
+            results.count = results.count + 1
+            results.names.push(file.name)
+            results.moreInfo[file.name] = {dir: this.cacheLocation, pathToFile: path.join(this.cacheLocation, file.name)}
+        }
+
+        return results
+    }
+
     private statsFileExist(): boolean {
         return fs.existsSync(this.statsFileLocation)
     }
     private createStatsFile() {
         fs.createFileSync(this.statsFileLocation)
     }
-    private parseFileManagers(managers: statsFile.FileManager[] | undefined): fileList | undefined {
-        const files = managers;
-        if (!files) return undefined;
 
-        let results: fileList = {count: 0, names: [], moreInfo: {}}
-        for (const file of files) {
-            results.count++;
+    addFile(location: string, belongsToGroups: string[] = [], options?: cacheAddFileOptions): addFileStatus{
+        const name: string = options?.newName || path.parse(location).base;
 
-            const name = file.getName();
-            const loc = file.getLocation();
-
-            results.names.push(name);
-            results.moreInfo[name] = {dir: loc, pathToFile: path.join(loc, name)}
-        }
-        return results
-    }
-    private removeFileNoSaving(name: string): removeFileStatus {
-        try {
-            if (!this.statsFile.getFile(name)) return removeFileStatus.FileDoesntExist
-            this.statsFile.removeFile(name);
-            fs.unlinkSync(path.join(this.cacheLocation, name))
-        } catch (e) {
-            return removeFileStatus.Unknown
-        }
-
-        return removeFileStatus.Ok
-    }
-
-    addFile(location: string, metadata?: {[p:string]: string}, belongsToGroups: string[] = [], options?: cacheAddFileOptions): addFileStatus{
-        options = makeCacheAddFileOptionsReasonable(options);
-        let fileName = "";
+        if (!fs.existsSync(location)) return addFileStatus.InputFileNotExist
+        if (fs.existsSync(path.join(this.cacheLocation, name)) && !options?.overwrite) return addFileStatus.FileAlreadyExists
 
         try {
-            if (!location || !fs.existsSync(location)) {return addFileStatus.InputFileNotExist}
-
-            fileName = options.newName || path.parse(location).base;
-
-            if (this.statsFile.getFile(fileName) && !options.overwrite) {return addFileStatus.FileAlreadyExists}
-
-            fs.copyFileSync(location, path.join(this.cacheLocation, fileName))
+            fs.copyFileSync(location, path.join(this.cacheLocation, name))
         } catch (e) {
             return addFileStatus.Unknown
         }
 
-        this.statsFile.addFile(fileName, metadata, belongsToGroups);
+        this.statsFile.GroupsManager.addGroup(name, belongsToGroups);
         this.statsFile.saveFile();
         return addFileStatus.Ok
     }
-    addMetadataToFile(fileName: string, metadata: {[p: string]: string}) {
-        this.statsFile.addMetadata(fileName, metadata);
-        this.statsFile.saveFile();
-    }
-    addFileToGroup(fileName: string, groups: string[]) {
-        this.statsFile.addToGroup(fileName, groups);
-        this.statsFile.saveFile();
-    }
+    removeFiles(names: string[], partialMatch: boolean = true, caseSensitive: boolean = false) {
+        const foundFiles = this.findFiles(names, partialMatch, caseSensitive);
 
-    removeFile(name: string): removeFileStatus {
-        const status = this.removeFileNoSaving(name);
-        this.statsFile.saveFile();
-        return status;
-    }
-    removeFiles(...names: string[]): {[name: string]: removeFileStatus} {
-        let results: {[name: string]: removeFileStatus} = {};
+        for (const name of foundFiles.names) {
+            const fInfo = foundFiles.moreInfo[name];
+            if (!fInfo) continue;
 
-        for (const name of names || []) results[name] = this.removeFileNoSaving(name);
-        this.statsFile.saveFile()
-
-        return results
-    }
-    removeMetadata(fileName: string, key: string) {
-        try {
-            this.statsFile.removeMetadata(fileName, key);
-            this.statsFile.saveFile();
-        } catch {}
-    }
-    removeGroup(fileName: string, group_name: string) {
-        try {
-            this.statsFile.removeGroup(fileName, group_name);
-            this.statsFile.saveFile();
-        } catch {}
-    }
-
-    getFiles(name: string): fileList {
-        let results: fileList = {count: 0, names: [], moreInfo: {}}
-
-        for (const fm of this.statsFile.matchFiles(name)) {
-            results.count++;
-
-            const name = fm.getName();
-            const loc = fm.getLocation();
-
-            results.names.push(name);
-            results.moreInfo[name] = {dir: loc, pathToFile: path.join(loc, name)}
+            fs.unlinkSync(fInfo.pathToFile);
+            this.statsFile.GroupsManager.removeGroup(name, this.statsFile.GroupsManager.getAllGroupsOfAFile(name) || [])
         }
 
-        return results
+        this.statsFile.saveFile()
     }
-    getFilesWithFilter(filters?: filters): fileList {
-        let results: fileList = {count: 0, names: [], moreInfo: {}}
-        filters = makeFiltersReasonable(filters);
+    getFiles(keywords: string[], partialMatch: boolean = true, caseSensitive: boolean = false): fileList {
+        return this.findFiles(keywords, partialMatch, caseSensitive)
+    }
+    getFilesInGroups(group_names: string[], logic: "or" | "and") {
+        const files: string[] = [];
 
-        filters.names?.map(v=>`${v}`.toLowerCase())
+        for (const group_name of group_names) {
+            const fileNames = this.statsFile.GroupsManager.getAllFilesInGroup(group_name) || [];
+            for (const fileName of fileNames) if (!files.includes(fileName)) files.push(fileName)
+        }
 
-        for (const f of this.statsFile.getAllFiles()) {
+        if (logic === "and") {
+            for (const file of files) {
+                const fileGroups = this.statsFile.GroupsManager.getAllGroupsOfAFile(file) || []
 
-            //Checking if names match
-            if (filters.names?.length) {
-                let matches = false;
-                for (const name of filters.names) {
-                    if (f.getName().indexOf(name) === -1) continue;
-
-                    matches = true
-                    break
-                }
-                if (!matches) continue;
-            }
-
-            //Checking if file is in group
-            if (filters.inGroups?.length) {
-                let matches = true;
-                for (const groupName of filters.inGroups) {
-                    const inGroup = f.inGroup(groupName);
-
-                    if (filters.groupsLogic === "or") {
-                        if (!inGroup) {
-                            matches = false
-                            continue
-                        }
-                        matches = true
-                        break;
-                    } else {
-                        if (inGroup) continue;
-                    }
-
-                    matches = false;
+                let keep: boolean = true;
+                for (const group_name of group_names) {
+                    if (fileGroups.includes(group_name)) continue;
+                    keep = false;
                     break;
                 }
-
-                if (!matches) continue;
-            }
-
-            //Checking if file has metadata
-            const mKeys = Object.keys(filters.hasMetadata || {});
-            if (filters.hasMetadata && mKeys.length) {
-                let matches = true;
-                for (const key of mKeys) {
-                    const savedMetadataValue = f.getMetadata(key);
-
-                    if (filters.metadataLogic === "or") {
-                        if (savedMetadataValue !== undefined && savedMetadataValue === filters.hasMetadata[key]) {
-                            matches = true
-                            break
-                        }
-                        continue;
-                    } else {
-                        if (savedMetadataValue !== undefined && savedMetadataValue === filters.hasMetadata[key]) continue;
-                    }
-
-                    matches = false
-                    break
+                if (!keep) {
+                    const i = files.indexOf(file);
+                    if (i === -1) continue
+                    files.splice(i, 1)
                 }
-                if (!matches) continue;
             }
-
-            results.count++;
-            results.names.push(f.getName());
-            results.moreInfo[f.getName()] = {dir: f.getLocation(), pathToFile: path.join(f.getLocation(), f.getName())}
-
         }
 
-        return results
+        return files
     }
-    getFilesInGroup(group_name: string): fileList | undefined {
-        const files = this.statsFile.getGroup(group_name);
-        if (!files) return undefined
-        let results: fileList = {count: 0, names: [], moreInfo: {}};
+    getFilesWithFilter(filters: filters, partialMatch: boolean = true, caseSensitive: boolean = false): fileList {
+        const result = newFileList()
+        filters = makeFiltersReasonable(filters)
 
-        for (const fm of files) {
-            results.count++;
+        const filesMatchingKeywords = this.findFiles(filters.keywords || [], partialMatch, caseSensitive)
+        const filesMatchingInGroups = this.getFilesInGroups(filters.inGroups || [], filters.groupsLogic || "and")
 
-            const name = fm.getName();
-            const loc = fm.getLocation();
-
-            results.names.push(name)
-            results.moreInfo[name] = {dir: loc, pathToFile: path.join(loc, name)}
+        for (const key of filesMatchingKeywords.names) {
+            if (!filesMatchingInGroups.includes(key)) continue;
+            result.count++
+            result.names.push(key)
+            result.moreInfo[key] = filesMatchingKeywords.moreInfo[key]
         }
 
-        return results
-    }
-    getMetadata(fileName: string, metadata_key: string): string | undefined {
-        return this.statsFile.getMetadata(fileName, metadata_key);
-    }
-    getFilesWithMetadataKey(key: string): fileList | undefined {
-        return this.parseFileManagers(this.statsFile.getFilesThatHaveMetadataKey(key));
-    }
-    getFilesWhereMetadataValueMatches(key: string, value: string) {
-        return this.parseFileManagers(this.statsFile.getFilesThatHaveMetadataKey(key, value));
+        return result
     }
 
     constructor(rootLocation: string, name: string) {
@@ -277,7 +179,7 @@ export class Cache {
         this.cacheLocation = cacheLocation;
         this.statsFileLocation = path.join(this.cacheLocation, `${this.cacheName}.json`);
 
-        if (!this.statsFileExist()) {this.createStatsFile()}
+        if (!this.statsFileExist()) this.createStatsFile()
         this.statsFile = new statsFile.StatsFile(this.cacheLocation, `${this.cacheName}.json`);
     }
 }
@@ -329,23 +231,16 @@ export class CacheManager {
 // for (let i =1; i <= 6; i++) {
 //     console.log(cache.addFile(
 //         `C:\\Users\\service_switch\\Desktop\\Sample Artworks\\working-sample (${i}).pdf`,
-//         {"index": `index-${i}`, "test": "hello"},
-//         ["group-x", `group-${i}`],
+//         ["group-1", "group-2"],
 //         {overwrite: true}
 //     ));
 // }
-// cache.addMetadataToFile(`hellox.pdf`, {"bla1": "alb1"})
-// cache.addFileToGroup("binder1.pdf", ["qwe", "rty"])
 // console.log(cache.addFile("C:\\Users\\service_switch\\Desktop\\Binder1.pdf"));
-// console.log(cache.removeFile(".pdf"));
-// console.log(cache.getFiles(".pdf"));
+// console.log(cache.removeFiles(["(1)"]));
+// console.log(cache.getFiles([".pdf"]));
 // console.log(cache.getFilesInGroup("rty"));
-// console.log(cache.getMetadata("hellox.pdf", "holla"));
-// console.log(cache.getFilesWhereMetadataValueMatches("bla1", "alb1"));
-// cache.removeMetadata("hellox.pdf", "holla2");
-// console.log(cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}));
-// console.log(cache.getFilesWithFilter({names: [], inGroups: ["group-3", "group-5"], hasMetadata: {}, groupsLogic: "or"}));
-// console.log(cache.removeFiles(...cache.getFilesWithFilter(".pdf", {inGroups: [], hasMetadata: {}}).names));
+// console.log(cache.getFilesInGroups(["group-1", "group-2"], "and"));
+// console.log(cache.getFilesWithFilter({keywords: ["(4)", ".pdf"], inGroups: ["group-2"], groupsLogic: "and"}));
 
 
 

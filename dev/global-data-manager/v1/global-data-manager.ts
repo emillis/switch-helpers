@@ -1,4 +1,4 @@
-import {NameGenerator} from "../main";
+import {NameGenerator} from "../../main";
 
 export type config = {
     tag: string,
@@ -80,7 +80,7 @@ export class Entry<T> {
     }
 }
 
-export class GlobalDataManager<T> {
+export default class GlobalDataManager<T> {
     private readonly switch: Switch;
     private readonly cfg: config;
     private readonly randGen: NameGenerator.AdvancedStringGenerator;
