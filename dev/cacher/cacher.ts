@@ -161,7 +161,7 @@ export class Cache {
         const filesMatchingInGroups = this.getFilesInGroups(filters.inGroups || [], filters.groupsLogic || "and")
 
         for (const key of filesMatchingKeywords.names) {
-            if (!filesMatchingInGroups.includes(key)) continue;
+            if (filters.inGroups && filters.inGroups.length && !filesMatchingInGroups.includes(key)) continue;
             result.count++
             result.names.push(key)
             result.moreInfo[key] = filesMatchingKeywords.moreInfo[key]
@@ -240,7 +240,7 @@ export class CacheManager {
 // console.log(cache.getFiles([".pdf"]));
 // console.log(cache.getFilesInGroup("rty"));
 // console.log(cache.getFilesInGroups(["group-1", "group-2"], "and"));
-// console.log(cache.getFilesWithFilter({keywords: ["(4)", ".pdf"], inGroups: ["group-2"], groupsLogic: "and"}));
+// console.log(cache.getFilesWithFilter({keywords: ["(4)"], inGroups: [], groupsLogic: "and"}));
 
 
 
