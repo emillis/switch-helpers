@@ -63,17 +63,17 @@ export class Cache {
     //Finds files matching keywords withing the directory
     private findFiles(keywords: string[], partialMatch: boolean = true, caseSensitive: boolean = false): fileList {
         const results: fileList = newFileList()
-        if (!caseSensitive) keywords = keywords.map(kw=>kw.toLowerCase())
+        if (!caseSensitive) keywords = keywords.map(keyword=>keyword.toLowerCase())
 
         const files = fs.readdirSync(this.cacheLocation, {withFileTypes: true})
             .filter(item=>!item.isDirectory())
 
         for (const file of files) {
-            let add: boolean = true
+            let add: boolean = false
             const fileName = caseSensitive ? file.name : file.name.toLowerCase();
             for (const keyword of keywords) {
-                if (partialMatch ? fileName.includes(keyword) : fileName === keyword) continue;
-                add = false;
+                if (partialMatch ? !fileName.includes(keyword) : fileName !== keyword) continue;
+                add = true;
                 break
             }
             if (!add) continue;
@@ -236,7 +236,7 @@ export class CacheManager {
 //     ));
 // }
 // console.log(cache.addFile("C:\\Users\\service_switch\\Desktop\\Binder1.pdf"));
-// console.log(cache.removeFiles(["(1)"]));
+// console.log(cache.removeFiles(["1"]));
 // console.log(cache.getFiles([".pdf"]));
 // console.log(cache.getFilesInGroup("rty"));
 // console.log(cache.getFilesInGroups(["group-1", "group-2"], "and"));
