@@ -26,5 +26,5 @@ export declare class Zip {
     addFile(loc: string, options?: addFileOptions): void;
     addFiles(...files: string[]): void;
     constructor(options?: zipperOptions);
-    private init;
+    init(): void;
 }
