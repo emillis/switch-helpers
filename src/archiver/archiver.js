@@ -142,7 +142,7 @@ class Zip {
         this.zipLocation = path.join(`${this.options.tmpLocation}`, this.name);
     }
     //Init method creates all pre-requisites for generating the archive.
-    init() {
+    async init() {
         if (this.wasInitiated)
             throw `Method .init(...) has already been called for class "Zip"`;
         this.wasInitiated = true;
@@ -154,6 +154,7 @@ class Zip {
         });
         this.archive.on('error', err => { throw err; });
         this.archive.pipe(w);
+        return this;
     }
 }
 exports.Zip = Zip;

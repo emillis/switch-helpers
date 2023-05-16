@@ -138,7 +138,7 @@ export class Zip {
         this.zipLocation = path.join(`${this.options.tmpLocation}`, this.name)
     }
     //Init method creates all pre-requisites for generating the archive.
-    init() {
+    async init(): Promise<Zip> {
         if (this.wasInitiated) throw `Method .init(...) has already been called for class "Zip"`;
         this.wasInitiated = true
         const w = fs.createWriteStream(this.zipLocation, {encoding: "utf-8"});
@@ -150,6 +150,8 @@ export class Zip {
         this.archive.on('error', err=>{throw err});
 
         this.archive.pipe(w)
+
+        return this
     }
 }
 
