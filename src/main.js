@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Mutex = exports.CsvProcessor = exports.BasicLogic = exports.Archiver = exports.JobManager = exports.Reporter = exports.DatasetGenerator = exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
+exports.PdfDuplicator = exports.Mutex = exports.CsvProcessor = exports.BasicLogic = exports.Archiver = exports.JobManager = exports.Reporter = exports.DatasetGenerator = exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
 exports.FindInLocation = __importStar(require("./find-in-location/find-in-location"));
 exports.OutConnectionManager = __importStar(require("./out-connection-manager/out-connection-manager"));
 exports.NameGenerator = __importStar(require("./name-generator/name-generator"));
@@ -40,3 +40,4 @@ exports.Archiver = __importStar(require("./archiver/archiver"));
 exports.BasicLogic = __importStar(require("./basic-logic/basic-logic"));
 exports.CsvProcessor = __importStar(require("./csv-processor/csv-processor"));
 exports.Mutex = __importStar(require("./mutex/index-mutex"));
+exports.PdfDuplicator = __importStar(require("./pdf-page-duplicator/pdf-page-duplicator"));

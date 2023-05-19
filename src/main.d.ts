@@ -14,3 +14,4 @@ export * as Archiver from "./archiver/archiver";
 export * as BasicLogic from "./basic-logic/basic-logic";
 export * as CsvProcessor from "./csv-processor/csv-processor";
 export * as Mutex from "./mutex/index-mutex";
+export * as PdfDuplicator from "./pdf-page-duplicator/pdf-page-duplicator";
