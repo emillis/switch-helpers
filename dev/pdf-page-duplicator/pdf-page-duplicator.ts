@@ -98,6 +98,8 @@ export class Duplicator {
 
     constructor(pdfLocation: string) {
         this.pdfLocation = pdfLocation
+        const ext = path.parse(this.pdfLocation).ext
+        if (ext !== `.pdf`) throw `Only PDF files are allowed to Pdf Page Duplicator! Got "${ext}" file!`;
     }
     async init(): Promise<Duplicator> {
         if (this.initialized) throw `Duplicator was already initialized!`;

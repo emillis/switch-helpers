@@ -122,6 +122,9 @@ class Duplicator {
     }
     constructor(pdfLocation) {
         this.pdfLocation = pdfLocation;
+        const ext = path.parse(this.pdfLocation).ext;
+        if (ext !== `.pdf`)
+            throw `Only PDF files are allowed to Pdf Page Duplicator! Got "${ext}" file!`;
     }
     async init() {
         if (this.initialized)
