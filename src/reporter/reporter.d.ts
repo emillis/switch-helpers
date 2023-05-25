@@ -1,9 +1,9 @@
 /// <reference types="switch-scripting" />
-export type pageSetup = {
+export declare type pageSetup = {
     TabTitle: string;
     PageTitle: string;
 };
-export type messages = {
+export declare type messages = {
     Errors: string[];
     Warnings: string[];
     Successes: string[];
@@ -42,8 +42,13 @@ export declare class Reporter implements IReporter {
         name?: string;
         location?: string;
     }): string;
-    sendWithReportAttached(job: Job, flowElement: FlowElement, options?: {
-        datasetName?: string;
+    attachReport(job: Job, options: {
+        datasetName: string;
+        tmpLocation?: string;
+        tmpReportFileName?: string;
+    }): Promise<string>;
+    sendWithReportAttached(job: Job, flowElement: FlowElement, options: {
+        datasetName: string;
         tmpLocation?: string;
         tmpReportFileName?: string;
         newJobName?: string;

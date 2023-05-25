@@ -213,15 +213,19 @@ export class Reporter implements IReporter{
         return fullPath
     }
 
-    async sendWithReportAttached(job: Job, flowElement: FlowElement, options?: {datasetName?: string, tmpLocation?: string, tmpReportFileName?: string, newJobName?: string}) {
-        if (!job) {throw `"job" is not provided as an argument to method "sendJobToConnection"!`}
+    async attachReport(job: Job, options: {datasetName: string, tmpLocation?: string, tmpReportFileName?: string}): Promise<string> {
         const datasetGenerator = new DatasetGenerator.DatasetGenerator(job, options?.tmpLocation);
-        options = options || {};
+        const reportLocation = this.saveAsHtml({location: options.tmpLocation, name: options.tmpReportFileName})
+        await datasetGenerator.addDataset(options.datasetName, DatasetGenerator.allowedDatasetModels.Opaque, reportLocation, {replaceIfExist: true})
+        return reportLocation
+    }
+
+    async sendWithReportAttached(job: Job, flowElement: FlowElement, options: {datasetName: string, tmpLocation?: string, tmpReportFileName?: string, newJobName?: string}) {
+        if (!job) throw `"job" is not provided as an argument to method "sendWithReportAttached"!`;
 
         const ConnManager = new OutConnectionManager.OutConnectionManager(flowElement);
 
-        const reportLocation = this.saveAsHtml({location: options.tmpLocation, name: options.tmpReportFileName});
-        await datasetGenerator.addDataset(options.datasetName || `default-report-name`, DatasetGenerator.allowedDatasetModels.Opaque, reportLocation)
+        const reportLocation: string = await this.attachReport(job, {datasetName: options.datasetName, tmpLocation: options.tmpLocation, tmpReportFileName: options.tmpReportFileName})
 
         if (this.counts.errors()) {
             await ConnManager.trafficLights.sendToLogError(await job.createChild(reportLocation), EnfocusSwitch.DatasetModel.Opaque, options.newJobName)
