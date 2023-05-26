@@ -59,17 +59,54 @@ class Splitter {
             results.push(i);
         return results;
     }
-    //Using this method you can split PDF into multiple different PDF files. If the `split` parameter
-    //is left empty, every page gets split. You can also specify a range of pages to be split, e.g.: "5-9".
-    //So a full example of `split` parameter might look like this: [`1`, `16`, `18-20`, `22`, `35-40`]
-    async split(split) {
+    //This method splits PDF into documents with even number of sheets defined in `batchSize` parameter
+    //options.batchNumberingType -  "range" defines the range that's been split. E.g. "1-20", "1001-2000", etc..
+    //                              "sequential" adds sequence number to the batch split. E.g. "1", "2", "3", etc..
+    //options.sequentialMinlength - Only needed if using `batchNumberingType`="sequential". This is the min width of the sequence number
+    async splitToEqualBatches(batchSize, options) {
         this.wasInitialized();
         if (!this.docToSplit)
             throw `Document is not assigned!`;
-        if (!split.length)
-            split = this.docToSplit.getPageIndices().map(v => { return v + 1; });
+        options = options || {};
+        if (options.batchNumberingType !== "range" && options.batchNumberingType !== "sequential")
+            options.batchNumberingType = "range";
+        if (!options.sequentialMinlength || typeof options.sequentialMinlength !== "number" || options.sequentialMinlength < 1)
+            options.sequentialMinlength = 4;
         const pageCount = this.docToSplit.getPageCount();
-        for (const splitPages of split) {
+        const lengths = [];
+        for (let i = 1; i <= pageCount; i = i + batchSize)
+            lengths.push(`${i}-${i + batchSize - 1}`);
+        const docsToSave = await this.split(lengths);
+        for (let i = 0; i < docsToSave.length; i++) {
+            const docToSave = docsToSave[i];
+            if (options.batchNumberingType === "sequential") {
+                let seq = `${i + 1}`;
+                for (let j = 0; seq.length < options.sequentialMinlength; j++)
+                    seq = `0${seq}`;
+                docToSave.range = seq;
+            }
+            this.docsToSave.push(docToSave);
+        }
+    }
+    //Using this method you can split PDF into multiple different PDF files. If the `split` parameter
+    //is left empty, every page gets split. You can also specify a range of pages to be split, e.g.: "5-9".
+    //So a full example of `split` parameter might look like this: [`1`, `16`, `18-20`, `22`, `35-40`]
+    async splitToDefinedLengths(lengths) {
+        this.wasInitialized();
+        if (!this.docToSplit)
+            throw `Document is not assigned!`;
+        for (const entry of await this.split(lengths))
+            this.docsToSave.push(entry);
+    }
+    async split(groups) {
+        this.wasInitialized();
+        if (!this.docToSplit)
+            throw `Document is not assigned!`;
+        const result = [];
+        if (!groups.length)
+            groups = this.docToSplit.getPageIndices().map(v => { return v + 1; });
+        const pageCount = this.docToSplit.getPageCount();
+        for (const splitPages of groups) {
             const pages = this.prettifySplitValue(`${splitPages}`).filter(v => v <= pageCount);
             if (!pages.length)
                 continue;
@@ -77,10 +114,12 @@ class Splitter {
             const pagesArray = await newDoc.copyPages(this.docToSplit, this.docToSplit.getPageIndices());
             for (const page of pages)
                 newDoc.addPage(pagesArray[page - 1]);
-            this.docsToSave.push({ range: pages.length > 1 ? `${pages[0]}-${pages[pages.length - 1]}` : `${pages[0]}`, pdf: newDoc });
+            result.push({ range: pages.length > 1 ? `${pages[0]}-${pages[pages.length - 1]}` : `${pages[0]}`, pdf: newDoc });
         }
+        return result;
     }
-    //This method saves the files in the location specified
+    //This method saves the files in the location specified.
+    //options.separator is the separator between file name and the page number/range that's been split
     async save(location, options) {
         this.wasInitialized();
         if (!this.docToSplit)
@@ -116,7 +155,15 @@ class Splitter {
 }
 exports.Splitter = Splitter;
 // (new Splitter(`C:/Users/service_switch/Desktop/Sample Artworks/Page Splitter Testing/one.pdf`)).init().then(splitter=>{
-//     splitter.split([]).then(()=>{
+//     //@ts-ignore
+//     splitter.splitToEqualBatches(3, {batchNumberingType: `sequential`, sequentialMinlength: -5}).then(()=>{
+//         splitter.save(`C:/Users/service_switch/Desktop/Sample Artworks/Page Splitter Testing`, {separator: `_`}).then(()=>{
+//             console.log(`Saved!`);
+//         })
+//     })
+// })
+// (new Splitter(`C:/Users/service_switch/Desktop/Sample Artworks/Page Splitter Testing/one.pdf`)).init().then(splitter=>{
+//     splitter.splitToDefinedLengths([1,3,`5-7`]).then(()=>{
 //         splitter.save(`C:/Users/service_switch/Desktop/Sample Artworks/Page Splitter Testing`, {separator: `_`}).then(()=>{
 //             console.log(`Saved!`);
 //         })
