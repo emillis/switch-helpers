@@ -94,7 +94,7 @@ export class Splitter {
 
     //This method saves the files in the location specified.
     //options.separator is the separator between file name and the page number/range that's been split
-    async save(location: string, options?: {separator?: string}) {
+    async save(location: string, options?: {separator?: string}): Promise<string[]> {
         this.wasInitialized()
         if (!this.docToSplit) throw `Document is not assigned`;
 
@@ -106,9 +106,13 @@ export class Splitter {
             location = path.join(parsedLocation.dir, parsedLocation.name)
         }
 
+        const result: string[] = [];
         for (const docToSave of this.docsToSave) {
-            fs.writeFileSync(`${location}${options?.separator || `_`}${docToSave.range}.pdf`, await docToSave.pdf.save());
+            const filePath: string = `${location}${options?.separator || `_`}${docToSave.range}.pdf`;
+            fs.writeFileSync(filePath, await docToSave.pdf.save());
+            result.push(filePath)
         }
+        return result
     }
 
     constructor(pdfLocation: string) {

@@ -13,7 +13,7 @@ export declare class Splitter {
     private split;
     save(location: string, options?: {
         separator?: string;
-    }): Promise<void>;
+    }): Promise<string[]>;
     constructor(pdfLocation: string);
     init(): Promise<Splitter>;
 }

@@ -133,9 +133,13 @@ class Splitter {
         else {
             location = path.join(parsedLocation.dir, parsedLocation.name);
         }
+        const result = [];
         for (const docToSave of this.docsToSave) {
-            fs.writeFileSync(`${location}${options?.separator || `_`}${docToSave.range}.pdf`, await docToSave.pdf.save());
+            const filePath = `${location}${options?.separator || `_`}${docToSave.range}.pdf`;
+            fs.writeFileSync(filePath, await docToSave.pdf.save());
+            result.push(filePath);
         }
+        return result;
     }
     constructor(pdfLocation) {
         this.pdfLocation = pdfLocation;
