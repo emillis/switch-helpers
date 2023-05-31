@@ -141,7 +141,7 @@ export class Splitter {
 // })
 
 // (new Splitter(`C:/Users/service_switch/Desktop/Sample Artworks/Page Splitter Testing/one.pdf`)).init().then(splitter=>{
-//     splitter.splitToDefinedLengths([1,3,`5-7`]).then(()=>{
+//     splitter.splitToDefinedLengths([1, 5, `7-10`]).then(()=>{
 //         splitter.save(`C:/Users/service_switch/Desktop/Sample Artworks/Page Splitter Testing`, {separator: `_`}).then(()=>{
 //             console.log(`Saved!`);
 //         })
