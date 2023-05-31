@@ -77,6 +77,7 @@ class Resizer {
         }
     }
     async save(loc, options) {
+        const results = [];
         const parsedLoc = path.parse(loc);
         if (parsedLoc.ext === ``)
             throw `Invalid file name "${parsedLoc.base}" provided!`;
@@ -84,9 +85,11 @@ class Resizer {
             throw `Cannot save the file as location "${parsedLoc.dir}" does not exist!`;
         let separator = options?.separator || ``;
         for (const i of this.imagesToSave) {
-            console.log(await this.generateSuffix(i, options?.suffix));
-            await i.image.toFile(path.join(parsedLoc.dir, `${parsedLoc.name}${separator}${await this.generateSuffix(i, options?.suffix)}${parsedLoc.ext}`));
+            const loc = path.join(parsedLoc.dir, `${parsedLoc.name}${separator}${await this.generateSuffix(i, options?.suffix)}${parsedLoc.ext}`);
+            await i.image.toFile(loc);
+            results.push(loc);
         }
+        return results;
     }
     constructor(origin, options) {
         this.origin = origin;

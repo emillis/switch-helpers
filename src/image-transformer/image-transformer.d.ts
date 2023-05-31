@@ -21,7 +21,7 @@ export declare class Resizer {
     private calculateNewDimensions;
     private generateSuffix;
     resize(images: imageOption[]): void;
-    save(loc: string, options?: resizerSaveOptions): Promise<void>;
+    save(loc: string, options?: resizerSaveOptions): Promise<string[]>;
     constructor(origin: string, options?: {
         sharpOptions?: SharpOptions;
     });
