@@ -97,12 +97,12 @@ export class Resizer {
     }
 }
 
-const r = new Resizer(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Image Resizer Testing\\original.jpeg`);
-r.resize([
-    {w: 300, h: 300},
-    {w: 450},
-    {h: 600},
-])
-r.save(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Image Resizer Testing\\new.jpeg`, {suffix: `dimensions`, separator: `_`}).then(()=>{
-    console.log(`Resized!`);
-})
+// const r = new Resizer(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Image Resizer Testing\\original.jpeg`);
+// r.resize([
+//     {w: 300, h: 300},
+//     {w: 450},
+//     {h: 600},
+// ])
+// r.save(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Image Resizer Testing\\new.jpeg`, {suffix: `dimensions`, separator: `_`}).then(()=>{
+//     console.log(`Resized!`);
+// })

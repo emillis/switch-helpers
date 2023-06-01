@@ -1,4 +1,4 @@
-export type groups = {
+export declare type groups = {
     groupToFile: {
         [groupId: string]: string[];
     };
@@ -22,7 +22,7 @@ export declare class GroupsManager {
     runCleanup(): void;
     constructor(groupJson: any);
 }
-export type statsFile = {
+export declare type statsFile = {
     groups: groups;
 };
 export declare class StatsFile {

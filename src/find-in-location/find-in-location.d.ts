@@ -2,19 +2,19 @@ export declare const notExistingOptions: {
     readonly returnEmptyResults: "returnEmptyResults";
     readonly throwError: "throwError";
 };
-export type notExistingOptions = typeof notExistingOptions[keyof typeof notExistingOptions];
+export declare type notExistingOptions = typeof notExistingOptions[keyof typeof notExistingOptions];
 export declare const searchTarget: {
     readonly both: "both";
     readonly files: "files";
     readonly folders: "folders";
 };
-export type searchTarget = typeof searchTarget[keyof typeof searchTarget];
-export type returnTypes = {
+export declare type searchTarget = typeof searchTarget[keyof typeof searchTarget];
+export declare type returnTypes = {
     full: boolean;
     name: boolean;
     nameProper: boolean;
 };
-export type searchEngineOptions = {
+export declare type searchEngineOptions = {
     allowedExt?: string[];
     allowPartialMatch?: boolean;
     caseSensitiveMatch?: boolean;
@@ -25,7 +25,7 @@ export type searchEngineOptions = {
     ifNeedleDoesNotExist?: notExistingOptions;
 };
 export declare const searchEngineOptionsDefaults: searchEngineOptions;
-export type searchResult = {
+export declare type searchResult = {
     results: {
         full?: string[];
         name?: string[];
