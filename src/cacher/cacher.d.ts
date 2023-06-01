@@ -3,25 +3,25 @@ export declare const allowedActions: {
     readonly recall: "recall";
     readonly remove: "remove";
 };
-export declare type allowedActions = typeof allowedActions[keyof typeof allowedActions];
+export type allowedActions = typeof allowedActions[keyof typeof allowedActions];
 export declare const addFileStatus: {
     readonly Ok: "Ok";
     readonly FileAlreadyExists: "FileAlreadyExists";
     readonly Unknown: "Unknown";
     readonly InputFileNotExist: "InputFileNotExist";
 };
-export declare type addFileStatus = typeof addFileStatus[keyof typeof addFileStatus];
+export type addFileStatus = typeof addFileStatus[keyof typeof addFileStatus];
 export declare const removeFileStatus: {
     readonly Ok: "Ok";
     readonly FileDoesntExist: "FileDoesntExist";
     readonly Unknown: "Unknown";
 };
-export declare type removeFileStatus = typeof removeFileStatus[keyof typeof removeFileStatus];
-export declare type cacheAddFileOptions = {
+export type removeFileStatus = typeof removeFileStatus[keyof typeof removeFileStatus];
+export type cacheAddFileOptions = {
     overwrite?: boolean;
     newName?: string;
 };
-export declare type fileList = {
+export type fileList = {
     count: number;
     names: string[];
     moreInfo: {
@@ -31,7 +31,7 @@ export declare type fileList = {
         };
     };
 };
-export declare type filters = {
+export type filters = {
     keywords?: string[];
     inGroups?: string[];
     groupsLogic?: "or" | "and";
