@@ -111,7 +111,7 @@ export class Duplicator {
 
 // const dup = new Duplicator(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Page duplicator testing\\one.pdf`)
 // dup.init().then(r=>{
-//     r.duplicateIndividualPages([`1`, `1`, `1-5`, `1`, `1`, `1`], 5).then(()=>{
+//     r.duplicateWholeDocument(5).then(()=>{
 //         r.save(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Page duplicator testing\\outcome.pdf`).then(()=>{
 //             console.log(`Saved!`);
 //         })
