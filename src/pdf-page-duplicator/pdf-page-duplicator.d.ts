@@ -4,6 +4,7 @@ export declare class Duplicator {
     private document;
     private wasInitialized;
     private prettifyPageArray;
+    private duplicateArray;
     duplicateWholeDocument(copies: number): Promise<void>;
     duplicateIndividualPages(duplicatePages: string[], copies: number): Promise<void>;
     save(location: string): Promise<void>;

@@ -67,15 +67,22 @@ class Duplicator {
         }
         return results;
     }
+    //This method will duplicate array supplied number of times defined in `copies` argument
+    duplicateArray(arr, copies) {
+        const result = [];
+        for (let i = 0; i < copies; i++)
+            result.push(...arr);
+        return result;
+    }
     //Duplicate the whole document for a number of times. This method will duplicate in a pattern of "123, 123, 123..."
     async duplicateWholeDocument(copies) {
         this.wasInitialized();
         if (!this.document)
             throw `Document is not assigned!`;
-        const pagesArray = await this.document.copyPages(this.document, this.document.getPageIndices());
-        for (let i = 1; i < copies; i++)
-            for (const page of pagesArray)
-                this.document.addPage(page);
+        const newDoc = await pdfLib.PDFDocument.create({ updateMetadata: true });
+        for (const page of await newDoc.copyPages(this.document, this.duplicateArray(this.document.getPageIndices(), copies)))
+            newDoc.addPage(page);
+        this.document = newDoc;
     }
     //This method allows to duplicate specific pages, but in a pattern of "111, 222, 333...". If the `duplicatePages`
     //array is left empty, every page gets duplicated. You can also specify a range of pages to be duplicated, e.g.: "5-9".
@@ -84,30 +91,11 @@ class Duplicator {
         this.wasInitialized();
         if (!this.document)
             throw `Document is not assigned!`;
-        const pages = this.prettifyPageArray(duplicatePages);
-        const newDocument = [];
-        //Copying all available pages from original PDF and saving them in the memory
-        for (const page of await this.document.copyPages(this.document, this.document.getPageIndices()))
-            newDocument.push([page]);
-        //This line check whether the pages to duplicate were supplied and if not, it assigns every page to be duplicated
-        if (!pages.length)
-            for (let i = 1; i <= newDocument.length; i++)
-                pages.push(i);
-        //This is what actually duplicates the pages. It makes each page's array with the right amount of copies
-        for (let i = 1; i < copies; i++)
-            for (let pageIndex of pages) {
-                const pageArray = newDocument[pageIndex - 1];
-                if (!pageArray || !pageArray.length)
-                    continue;
-                pageArray.push(pageArray[0]);
-            }
-        //Removing all pages from original PDF
-        for (let i = (this.document.getPageCount() - 1); i >= 0; i--)
-            this.document.removePage(i);
-        //Adding all pages back into the original PDF
-        for (const documentPages of newDocument)
-            for (const documentPage of documentPages)
-                this.document.addPage(documentPage);
+        const newDoc = await pdfLib.PDFDocument.create({ updateMetadata: true });
+        for (const page of await newDoc.copyPages(this.document, this.duplicateArray(this.prettifyPageArray(duplicatePages), copies).map(v => { return v - 1; }))) {
+            newDoc.addPage(page);
+        }
+        this.document = newDoc;
     }
     //This method saves the files in the location specified
     async save(location) {
@@ -118,7 +106,7 @@ class Duplicator {
             throw `Invalid location "${location}" provided as PDF saving location!`;
         if (path.parse(location).ext !== ".pdf")
             location = path.join(location, path.parse(this.pdfLocation).base);
-        fs.writeFileSync(location, await this.document.save());
+        fs.writeFileSync(location, await this.document.save({}));
     }
     constructor(pdfLocation) {
         this.pdfLocation = pdfLocation;
@@ -132,8 +120,16 @@ class Duplicator {
         this.initialized = true;
         if (!fs.existsSync(this.pdfLocation))
             throw `Pdf file does not exist in location "${this.pdfLocation}"!`;
-        this.document = await pdfLib.PDFDocument.load(fs.readFileSync(this.pdfLocation));
+        this.document = await pdfLib.PDFDocument.load(fs.readFileSync(this.pdfLocation), { updateMetadata: true });
         return this;
     }
 }
 exports.Duplicator = Duplicator;
+// const dup = new Duplicator(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Page duplicator testing\\one.pdf`)
+// dup.init().then(r=>{
+//     r.duplicateIndividualPages([`1`, `1`, `1-5`, `1`, `1`, `1`], 5).then(()=>{
+//         r.save(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Page duplicator testing\\outcome.pdf`).then(()=>{
+//             console.log(`Saved!`);
+//         })
+//     })
+// })
