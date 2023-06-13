@@ -2,8 +2,8 @@ import * as pdfLib from "pdf-lib";
 import * as fs from "fs-extra";
 import * as path from "path";
 
-const bannerPageLocation = {start: "start", end: "end"} as const;
-type bannerPageLocation = typeof bannerPageLocation[keyof typeof bannerPageLocation];
+export const bannerPageLocation = {start: "start", end: "end"} as const;
+export type bannerPageLocation = typeof bannerPageLocation[keyof typeof bannerPageLocation];
 
 export type dataEntry = {
     value:              string //Data value that will be displayed
