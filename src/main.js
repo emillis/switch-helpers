@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ImageTransformer = exports.PdfSplitter = exports.PdfDuplicator = exports.Mutex = exports.CsvProcessor = exports.BasicLogic = exports.Archiver = exports.JobManager = exports.Reporter = exports.DatasetGenerator = exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
+exports.PdfBannerPage = exports.ImageTransformer = exports.PdfSplitter = exports.PdfDuplicator = exports.Mutex = exports.CsvProcessor = exports.BasicLogic = exports.Archiver = exports.JobManager = exports.Reporter = exports.DatasetGenerator = exports.GlobalDataManager = exports.PropertyManager = exports.CacheManager = exports.Logger = exports.FileSaver = exports.GlobalSwitchConfig = exports.NameGenerator = exports.OutConnectionManager = exports.FindInLocation = void 0;
 exports.FindInLocation = __importStar(require("./find-in-location/find-in-location"));
 exports.OutConnectionManager = __importStar(require("./out-connection-manager/out-connection-manager"));
 exports.NameGenerator = __importStar(require("./name-generator/name-generator"));
@@ -43,3 +43,4 @@ exports.Mutex = __importStar(require("./mutex/index-mutex"));
 exports.PdfDuplicator = __importStar(require("./pdf-page-duplicator/pdf-page-duplicator"));
 exports.PdfSplitter = __importStar(require("./pdf-doc-splitter/pdf-doc-splitter"));
 exports.ImageTransformer = __importStar(require("./image-transformer/image-transformer"));
+exports.PdfBannerPage = __importStar(require("./pdf-banner-page/pdf-banner-page"));

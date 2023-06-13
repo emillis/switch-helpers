@@ -1,4 +1,5 @@
 import {ResizeOptions, Sharp, SharpOptions} from "sharp";
+//Required must be removed as it fails other processes even when they are not using image transformer
 // const sharp = require(`sharp`);
 import * as fs from "fs-extra";
 import * as path from "path";

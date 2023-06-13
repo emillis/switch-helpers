@@ -16,4 +16,5 @@ export * as CsvProcessor from "./csv-processor/csv-processor";
 export * as Mutex from "./mutex/index-mutex";
 export * as PdfDuplicator from "./pdf-page-duplicator/pdf-page-duplicator";
 export * as PdfSplitter from "./pdf-doc-splitter/pdf-doc-splitter";
-export * as ImageTransformer from "./image-transformer/image-transformer"
+export * as ImageTransformer from "./image-transformer/image-transformer";
+export * as PdfBannerPage from "./pdf-banner-page/pdf-banner-page";
