@@ -11,6 +11,10 @@ export type arrayPropertyOptions = {
     separator?: string
 }
 
+export type getStringPropertyOptions = {
+    separatorIfArray?: string
+}
+
 function makeGetPropertyFromListOptionsReasonable(options?: getPropertyFromListOptions): getPropertyFromListOptions {
     options = options || {
         caseSensitive: true,
@@ -55,13 +59,15 @@ export class PropertyManager {
             throw `An error occurred while trying to retrieve value from property with tag: "${tag}"${propertyName ? `, display name "${propertyName}"` : ""}! Original error: "${e}".`
         }
     }
-    async getStringProperty(tag: string): Promise<string | undefined> {
+
+    async getStringProperty(tag: string, options?: getStringPropertyOptions): Promise<string | undefined> {
         const val = await this.getProperty(tag);
 
         if (val === undefined) return undefined;
-        if (Array.isArray(val)) return val.join();
+        if (Array.isArray(val)) return val.join(options?.separatorIfArray);
         return `${val}`
     }
+
     async getStringPropertyOrFail(tag: string): Promise<string> {
         const val = await this.getStringProperty(tag)
 

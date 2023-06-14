@@ -1,20 +1,23 @@
 /// <reference types="switch-scripting" />
-export declare type propertyManagerOptions = {
+export type propertyManagerOptions = {
     throwErrorIfTagUndefined?: boolean;
 };
-export declare type getPropertyFromListOptions = {
+export type getPropertyFromListOptions = {
     caseSensitive?: boolean;
     partialMatch?: boolean;
 };
-export declare type arrayPropertyOptions = {
+export type arrayPropertyOptions = {
     separator?: string;
+};
+export type getStringPropertyOptions = {
+    separatorIfArray?: string;
 };
 export declare class PropertyManager {
     private readonly flowElement;
     private readonly options;
     propertyExists(tag: string): boolean;
     getProperty(tag: string): Promise<string | string[] | undefined>;
-    getStringProperty(tag: string): Promise<string | undefined>;
+    getStringProperty(tag: string, options?: getStringPropertyOptions): Promise<string | undefined>;
     getStringPropertyOrFail(tag: string): Promise<string>;
     getNumberProperty(tag: string): Promise<number | undefined>;
     getNumberPropertyOrFail(tag: string): Promise<number>;

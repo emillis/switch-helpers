@@ -39,12 +39,12 @@ class PropertyManager {
             throw `An error occurred while trying to retrieve value from property with tag: "${tag}"${propertyName ? `, display name "${propertyName}"` : ""}! Original error: "${e}".`;
         }
     }
-    async getStringProperty(tag) {
+    async getStringProperty(tag, options) {
         const val = await this.getProperty(tag);
         if (val === undefined)
             return undefined;
         if (Array.isArray(val))
-            return val.join();
+            return val.join(options?.separatorIfArray);
         return `${val}`;
     }
     async getStringPropertyOrFail(tag) {
