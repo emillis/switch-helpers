@@ -4,7 +4,7 @@ export declare const allowedLogTypes: {
     readonly JSON: "json";
 };
 export type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogTypes];
-type writeData = {
+export type writeData = {
     [key: string]: string;
 };
 export interface Writer {
@@ -41,4 +41,3 @@ export declare class Logger {
     constructor(rootLocation: string, id: string, options?: loggerOptions);
     init(): Promise<Logger>;
 }
-export {};

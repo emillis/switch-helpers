@@ -4,7 +4,7 @@ import * as path from "path"
 export const allowedLogTypes = {JSON: "json"} as const;
 export type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogTypes];
 
-type writeData = { [key: string]: string }
+export type writeData = { [key: string]: string }
 type fileStats = { size: number }
 
 export interface Writer {
