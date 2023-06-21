@@ -47,8 +47,8 @@ class PropertyManager {
             return val.join(options?.separatorIfArray);
         return `${val}`;
     }
-    async getStringPropertyOrFail(tag) {
-        const val = await this.getStringProperty(tag);
+    async getStringPropertyOrFail(tag, options) {
+        const val = await this.getStringProperty(tag, options);
         if (val === undefined)
             throw `tag "${tag}" has undefined value!`;
         return val;

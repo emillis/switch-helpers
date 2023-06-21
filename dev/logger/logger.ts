@@ -1,172 +1,220 @@
-import * as path from "path";
-import * as fs from "fs-extra";
-import {NameGenerator} from "../main"
+import * as fs from "fs-extra"
+import * as path from "path"
 
-export const logFormat = {Json: "Json", Txt: "Txt"} as const;
-export type logFormat = typeof logFormat[keyof typeof logFormat];
+export const allowedLogTypes = {JSON: "json"} as const;
+export type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogTypes];
 
-type loggerOptions = {
-    logFormat?: logFormat,
-    createLocationIfDoesntExist?: boolean
-    logExt?: string
-    logNaming?: string
-    maxSingleLogFileSize?: number
-}
-function makeLoggerOptionsReasonable(options?: loggerOptions): loggerOptions {
-    options = options || {}
+type writeData = { [key: string]: string }
+type fileStats = { size: number }
 
-    const allowedLogFormats = Object.values(logFormat);
-
-    options.logFormat = options.logFormat === undefined ? logFormat.Json : options.logFormat
-    if (!allowedLogFormats.includes(options.logFormat)) {throw `Invalid log format "${options.logFormat}" selected! Allowed values are: "${allowedLogFormats.join(`", "`)}"`}
-    options.createLocationIfDoesntExist = options.createLocationIfDoesntExist === undefined ? false : options.createLocationIfDoesntExist
-    options.logExt = options.logExt === undefined ? (options.logFormat === logFormat.Json ? ".json" : options.logFormat === logFormat.Txt ? ".txt" : ".tag") : `${options.logExt}`
-    if (options.logExt.substring(0, 1) !== ".") {options.logExt = `.${options.logExt}`}
-    options.logNaming = options.logNaming === undefined ? "logs" : `${options.logNaming}`
-    options.maxSingleLogFileSize = options.maxSingleLogFileSize === undefined ? 10000000 : +options.maxSingleLogFileSize
-
-    return options
+export interface Writer {
+    write(stream: fs.WriteStream, data: { [k: string]: string }): number
 }
 
-type logEntry = {
-    datetime: string
-    msg: string
-    customFields?: {any: any}
-}
-type logFile = any[]
+class JSONWriter implements Writer {
+    private readonly uriEncode: boolean;
 
-interface Adder {
-    add(entry: string): void
-}
-interface Saver {
-    save(location: string, logFile: logFile): void
-}
+    //Writes data to the stream as a string and returns a number of bytes written
+    write(stream: fs.WriteStream, data: writeData): number {
+        const newObj: writeData = {}
 
-class JsonEntry implements Adder, Saver{
-    private entries: logEntry[] = [];
+        for (const key of Object.keys(data)) newObj[this.uriEncode ? encodeURI(`${key}`) : `${key}`] = this.uriEncode ? encodeURI(`${data[key]}`) : `${data[key]}`
 
-    //Adds an entry to the log file and returns number of bytes added
-    add (entry: string) {
-        const le: logEntry = {
-            msg: entry,
-            datetime: NameGenerator.newDate({format: "YYYY-MM-DD hh:mm:ss.SSS"})
-        }
+        let str = `${JSON.stringify(newObj)},\r\n`
 
-        this.entries.push(le);
+        stream.write(str, "utf-8")
+        return str.length
     }
 
-    save(location: string) {
-        const currentFile: logEntry[] = [...JSON.parse(fs.readFileSync(location, "utf-8") || "[]"), ...this.entries];
-
-        fs.writeFileSync(location, JSON.stringify(currentFile), "utf-8")
+    constructor(uriEncodeValues: boolean) {
+        this.uriEncode = uriEncodeValues
     }
 }
-class TxtEntry implements Adder, Saver{
-    private entries: string[] = [];
 
-    //Adds an entry to the log file and returns number of bytes added
-    add (entry: string) {
-        this.entries.push(`Datetime: "${NameGenerator.newDate({format: "YYYY-MM-DD hh:mm:ss.SSS"}).replaceAll(";", "\;")}"; Msg: "${`${entry}`.replaceAll(";", "\\;")}"\n`);
-    }
-
-    save(location: string) {
-        fs.appendFileSync(location, this.entries.join(""), "utf-8")
-    }
+export type loggerOptions = {
+    maxLogSize?: number              //Max log file size in bytes, default is 10000000 (10MB)
+    writer?: Writer              //This allows client to define their own custom writer and thus control how you'll see the logs
+    uriEncodeWrittenValues?: boolean             //If set to true, key and value that's being written into the file get uri encoded
+    logType?: allowedLogTypes     //Defines the type of the log - json, txt, xml, etc..
+    omitAutoTimeStamp?: boolean             //If set to true, generates a time stamp automatically. Default is `true`
+    autoTimeStampKey?: string              //Key of the auto time stamp. Default is `created`
+}
+type loggerOptionsInternal = {
+    maxLogSize: number
+    writer?: Writer
+    uriEncodeWrittenValues: boolean
+    logType: allowedLogTypes
+    omitAutoTimeStamp: boolean
+    autoTimeStampKey: string
 }
 
 export class Logger {
-    private readonly options: loggerOptions;
-    private readonly logDirectory: string;
-    private readonly logFileName: string;
+    private readonly rootLoc: string;
+    private readonly logID: string;
     private readonly logExt: string;
-    private readonly fullLogFilePath: string;
-    private readonly logFile: any;
-    private readonly adder: Adder;
-    private readonly saver: Saver;
+    private readonly options: loggerOptionsInternal;
+    private isInitiated: boolean = false;
+    private writer: Writer | undefined;
+    private writeStream: fs.WriteStream | undefined;
+    private openLogFileStats: fs.Stats | undefined;
 
-    private logFileMatchesConditions(location: string): boolean {
-        let result = true;
-
-        if (!fs.existsSync(location)) throw `Log file "${location}" does not exist!`
-        const stats = fs.statSync(location);
-        if (!stats.isFile()) throw `Log file expected, got folder "${location}"!`
-        if (stats.size > (this.options.maxSingleLogFileSize || 10000000)) result = false
-
-        return result;
+    private wasInitiated() {
+        if (!this.isInitiated) throw `You must initiate Logger using its method .init() before using any other functionality!`;
     }
 
-    private getCurrentLogFileLocation(): string {
-        let index = 0;
-        const fileName = this.options.logNaming || "";
-        let logName = "";
-        let fullPath = "";
+    //Composes the actual file name
+    private composeName(index?: number): string {
+        return `${this.logID}-${index}${this.logExt}`
+    }
 
-        while (true) {
-            index++;
-            logName = `${fileName}-${index}${this.logExt}`;
-            const tmpFullPath = path.join(this.logDirectory, logName);
+    private logFileMatchesConditions(fileStats: fileStats): boolean {
+        if (fileStats.size > this.options.maxLogSize) return false
 
-            if (fs.existsSync(tmpFullPath)) {
-                fullPath = tmpFullPath
+        return true
+    }
+
+    //Gets the very latest log file generated
+    private getLatestLogFile(): string {
+        const potentialMatches: string[] = [];
+        const dirent = fs.readdirSync(this.rootLoc, {withFileTypes: true, encoding: "utf-8"})
+        for (const d of dirent) if (d.isFile() && d.name && d.name.includes(this.logID)) potentialMatches.push(d.name)
+
+        let name: string = this.composeName(1);
+        for (let i = 2; true; i++) {
+            if (potentialMatches.includes(this.composeName(i))) {
+                name = this.composeName(i)
                 continue
             }
-
-            //This will run only if there are no log files present
-            if (!fullPath) {
-                fullPath = tmpFullPath;
-                fs.createFileSync(fullPath);
-            }
-
-            if (!this.logFileMatchesConditions(fullPath)) {
-                fullPath = tmpFullPath;
-                fs.createFileSync(fullPath);
-                continue
-            }
-
             break
         }
 
-        if (!fileName || !logName || !fullPath) {throw `Either wrong file name, generated name or full path provided! File name: "${fileName}", generated name: "${logName}", full path: "${fullPath}"`}
+        const fullLoc = path.join(this.rootLoc, name);
 
-        return fullPath
+        if (!fs.existsSync(fullLoc)) fs.createFileSync(fullLoc)
+
+        return fullLoc
     }
 
-    add(entry: string) {
-        this.adder.add(entry)
-    }
+    //Checks for existing files withing the root location and changes new log file name accordingly
+    private generateNewLogName(): string {
+        const existingFiles: string[] = [];
+        const dirent = fs.readdirSync(this.rootLoc, {withFileTypes: true, encoding: "utf-8"})
 
-    saveFile() {
-        this.saver.save(this.fullLogFilePath, this.logFile);
-    }
+        for (const d of dirent) if (d.isFile() && d.name) existingFiles.push(d.name)
 
-    constructor(logLocation: string, options?: loggerOptions) {
-        this.options = makeLoggerOptionsReasonable(options);
+        let fileIndex: number = 1;
+        let fileName: string = this.composeName(fileIndex);
+        for (; true;) {
+            if (!existingFiles.includes(fileName)) break
 
-        this.logExt = this.options.logExt || ".tag";
-        this.logFileName = this.options.logNaming || "logs";
-        this.logDirectory = logLocation;
-
-        if (!this.logDirectory) {throw `Invalid log file location "${this.logDirectory}" provided!`}
-
-        //Creating directory or throwing an error if the dir doesn't exist
-        if (!fs.existsSync(this.logDirectory)) {
-            if (!this.options.createLocationIfDoesntExist) throw `Log directory "${this.logDirectory}" does not exist!`
-
-            fs.mkdirsSync(this.logDirectory);
+            fileIndex = fileIndex + 1
+            fileName = this.composeName(fileIndex)
         }
 
-        this.fullLogFilePath = this.getCurrentLogFileLocation();
+        const fullLoc = path.join(this.rootLoc, fileName);
 
-        if (this.options.logFormat === logFormat.Json) {
-            const jsonHandler = new JsonEntry();
-            this.adder = jsonHandler;
-            this.saver = jsonHandler;
-        } else if (this.options.logFormat === logFormat.Txt) {
-            const txtHandler = new TxtEntry();
-            this.adder = txtHandler;
-            this.saver = txtHandler;
-        } else {
-            throw `Log format "${this.options.logFormat}" is not allowed! Allowed log formats are: "${Object.values(logFormat).join(`", "`)}"`
+        if (!fs.existsSync(fullLoc)) fs.createFileSync(fullLoc)
+
+        return fullLoc
+    }
+
+    private processLoggerOptions(options?: loggerOptions): loggerOptionsInternal {
+        const result: loggerOptionsInternal = {
+            maxLogSize: options?.maxLogSize || 100000000000, //100GB by default
+            writer: options?.writer,
+            uriEncodeWrittenValues: !!options?.uriEncodeWrittenValues,
+            logType: options?.logType || allowedLogTypes.JSON,
+            omitAutoTimeStamp: options?.omitAutoTimeStamp === undefined ? false : options.omitAutoTimeStamp,
+            autoTimeStampKey: options?.autoTimeStampKey || `created`
+        };
+
+        return result
+    }
+
+    private async openLogFile(logFileLoc: string): Promise<fs.WriteStream> {
+        if (!this.logFileMatchesConditions({size: this.openLogFileStats?.size || 0})) {
+            logFileLoc = this.generateNewLogName();
+            this.openLogFileStats = fs.lstatSync(logFileLoc)
         }
+
+        return fs.createWriteStream(logFileLoc, {
+            encoding: "utf-8",
+            autoClose: true,
+            flags: 'as'
+        })
+    }
+
+    getWriteStream(): fs.WriteStream | undefined {
+        return this.writeStream
+    }
+
+    async write(data: writeData) {
+        if (!this.writer || !this.writeStream || !this.openLogFileStats) throw `Some resources have not been initialized! Could be "writer", "writeStream", or "openLogFileStats"`;
+
+        if (!this.options.omitAutoTimeStamp) data[this.options.autoTimeStampKey] = new Date().toISOString()
+
+        const bytesWritten = this.writer.write(this.writeStream, data)
+
+        this.openLogFileStats.size += bytesWritten
+
+        if (!this.logFileMatchesConditions({size: this.openLogFileStats.size})) {
+            const loc = this.generateNewLogName();
+            this.openLogFileStats = fs.lstatSync(loc)
+            this.writeStream = await this.openLogFile(loc)
+        }
+    }
+
+    constructor(rootLocation: string, id: string, options?: loggerOptions) {
+        if (!fs.pathExistsSync(rootLocation)) throw `Root location "${rootLocation}" for logs does not exist!`;
+        if (!fs.lstatSync(rootLocation).isDirectory()) throw `Expected a directory to be provided as root location, got "${rootLocation}"!`;
+        if (!path.isAbsolute(rootLocation)) throw `Root location provided to Logger "${rootLocation}" must be an absolute path!`;
+        this.rootLoc = rootLocation
+
+        if (!id) throw `Log ID "${id}" is invalid!`;
+        this.logID = `${id}`
+
+        this.logExt = `.txt`;
+
+        this.options = this.processLoggerOptions(options)
+    }
+
+    async init(): Promise<Logger> {
+        if (this.isInitiated) throw `The logger has already been initiated!`;
+        this.isInitiated = true
+
+        let latestLogFile = this.getLatestLogFile()
+        this.openLogFileStats = fs.lstatSync(latestLogFile)
+
+        this.writeStream = await this.openLogFile(latestLogFile)
+
+        this.writer = this.options?.writer || new JSONWriter(this.options.uriEncodeWrittenValues);
+
+        return this
     }
 }
+
+// const linesToAdd: number = 100000;
+// new Logger(`C:\\Users\\service_switch\\Desktop\\Sample Artworks\\Logger testing`, `test`, {maxLogSize: 1500000}).init().then(logger=>{
+//     const startedTime = Date.now();
+//     let i=0;
+//
+//     function iterate(l: Logger) {
+//         i++
+//         if (i>linesToAdd) {
+//             const finishedTime = Date.now();
+//             console.log(`Added "${linesToAdd}" lines to the log file and it took "${finishedTime-startedTime}ms" to perform this action.`);
+//             return
+//         }
+//         l.write({
+//             key1: `value-${i}`,
+//             key2: `value-${i}`,
+//             key3: `value-${i}`,
+//             key4: `value-${i}`,
+//             key5: `value-${i}`
+//         }).then(()=>{
+//             iterate(l)
+//         })
+//     }
+//
+//     iterate(logger)
+// })

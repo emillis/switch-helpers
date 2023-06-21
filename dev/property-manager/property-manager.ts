@@ -68,13 +68,14 @@ export class PropertyManager {
         return `${val}`
     }
 
-    async getStringPropertyOrFail(tag: string): Promise<string> {
-        const val = await this.getStringProperty(tag)
+    async getStringPropertyOrFail(tag: string, options?: getStringPropertyOptions): Promise<string> {
+        const val = await this.getStringProperty(tag, options)
 
         if (val === undefined) throw `tag "${tag}" has undefined value!`;
 
         return val
     }
+
     async getNumberProperty(tag: string): Promise<number | undefined> {
         const val = await this.getProperty(tag);
 

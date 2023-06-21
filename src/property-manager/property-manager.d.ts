@@ -1,15 +1,15 @@
 /// <reference types="switch-scripting" />
-export declare type propertyManagerOptions = {
+export type propertyManagerOptions = {
     throwErrorIfTagUndefined?: boolean;
 };
-export declare type getPropertyFromListOptions = {
+export type getPropertyFromListOptions = {
     caseSensitive?: boolean;
     partialMatch?: boolean;
 };
-export declare type arrayPropertyOptions = {
+export type arrayPropertyOptions = {
     separator?: string;
 };
-export declare type getStringPropertyOptions = {
+export type getStringPropertyOptions = {
     separatorIfArray?: string;
 };
 export declare class PropertyManager {
@@ -18,7 +18,7 @@ export declare class PropertyManager {
     propertyExists(tag: string): boolean;
     getProperty(tag: string): Promise<string | string[] | undefined>;
     getStringProperty(tag: string, options?: getStringPropertyOptions): Promise<string | undefined>;
-    getStringPropertyOrFail(tag: string): Promise<string>;
+    getStringPropertyOrFail(tag: string, options?: getStringPropertyOptions): Promise<string>;
     getNumberProperty(tag: string): Promise<number | undefined>;
     getNumberPropertyOrFail(tag: string): Promise<number>;
     getBooleanProperty(tag: string): Promise<boolean | undefined>;
