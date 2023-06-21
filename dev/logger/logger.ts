@@ -151,7 +151,7 @@ export class Logger {
     async write(data: writeData) {
         if (!this.writer || !this.writeStream || !this.openLogFileStats) throw `Some resources have not been initialized! Could be "writer", "writeStream", or "openLogFileStats"`;
 
-        if (!this.options.omitAutoTimeStamp) data[this.options.autoTimeStampKey] = new Date().toISOString()
+        if (!this.options.omitAutoTimeStamp) data[this.options.autoTimeStampKey] = new Date(Date.now() + 3600000).toISOString()
 
         const bytesWritten = this.writer.write(this.writeStream, data)
 
