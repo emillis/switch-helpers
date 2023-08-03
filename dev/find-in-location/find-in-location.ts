@@ -31,6 +31,11 @@ export const searchEngineOptionsDefaults: searchEngineOptions = {
     ifNeedleDoesNotExist: notExistingOptions.returnEmptyResults
 }
 
+type needle = {
+    originalNeedle: string
+    caseAdjustedNeedle: string
+}
+
 type genericResult = {
     full: string[],
     name: string[],
@@ -121,7 +126,7 @@ export class SearchEngine {
         return makeSenseOutOfOptions(options)
     }
 
-    private searchRecursively(results: searchResult, needles: string[], haystack: string, depth: number) {
+    private searchRecursively(results: searchResult, needles: needle[], haystack: string, depth: number) {
         let newDepth = depth - 1;
         results.stats.foldersScanned++
 
@@ -138,16 +143,20 @@ export class SearchEngine {
 
             if (this.options.allowPartialMatch) {
                 let found: boolean = false;
-
                 for (const needle of needles) {
-                    if (!hay.includes(needle)) continue
+                    if (!hay.includes(needle.caseAdjustedNeedle)) continue
                     found = true;
-                    belongsToNeedles.push(needle)
+                    belongsToNeedles.push(needle.originalNeedle)
                 }
-
                 if (!found) continue
             } else {
-                if (needles.includes(hay)) continue
+                let found: boolean = false;
+                for (const needle of needles) {
+                    if (needle.caseAdjustedNeedle !== hay) continue
+                    found = true
+                    break
+                }
+                if (!found) continue
             }
 
             const parsedName = path.parse(hayOriginal);
@@ -182,7 +191,6 @@ export class SearchEngine {
 
     public search(needles: string | string[], haystack: string): searchResult {
         if (!Array.isArray(needles)) needles = [`${needles}`];
-        if (!this.options.caseSensitiveMatch) needles.map(v => v.toLowerCase())
 
         const result: searchResult = initiateSearchResults(needles);
 
@@ -197,8 +205,12 @@ export class SearchEngine {
             }
         }
 
+        const n: needle[] = needles.map(v => {
+            return {originalNeedle: v, caseAdjustedNeedle: this.options.caseSensitiveMatch ? v : v.toLowerCase()}
+        });
+
         result.stats.timeTaken = Date.now();
-        this.searchRecursively(result, needles, haystack, this.options.scanDepth || searchEngineOptionsDefaults.scanDepth || 0)
+        this.searchRecursively(result, n, haystack, this.options.scanDepth || searchEngineOptionsDefaults.scanDepth || 0)
         result.stats.timeTaken = Date.now() - result.stats.timeTaken;
 
         //Checking if needle exist and acting based on what's in the options
@@ -216,6 +228,7 @@ export class SearchEngine {
 
 //======[TESTING]================================================================================================
 
+// console.log((new SearchEngine({scanDepth: 1})).search([`Enlarge A4 101%.eal`, `Convert Color to Gray and Keep Black Text.eal`], `D:/Switch Resources - Local/action_lists/auto_fixes/dagenham`));
 // console.log((new SearchEngine({scanDepth: 1})).search([`6pp`, `4pp`], `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`));
 
 // const scanLocation: string  =       `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`;

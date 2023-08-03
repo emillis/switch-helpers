@@ -96,16 +96,23 @@ class SearchEngine {
             if (this.options.allowPartialMatch) {
                 let found = false;
                 for (const needle of needles) {
-                    if (!hay.includes(needle))
+                    if (!hay.includes(needle.caseAdjustedNeedle))
                         continue;
                     found = true;
-                    belongsToNeedles.push(needle);
+                    belongsToNeedles.push(needle.originalNeedle);
                 }
                 if (!found)
                     continue;
             }
             else {
-                if (needles.includes(hay))
+                let found = false;
+                for (const needle of needles) {
+                    if (needle.caseAdjustedNeedle !== hay)
+                        continue;
+                    found = true;
+                    break;
+                }
+                if (!found)
                     continue;
             }
             const parsedName = path_1.default.parse(hayOriginal);
@@ -137,8 +144,6 @@ class SearchEngine {
     search(needles, haystack) {
         if (!Array.isArray(needles))
             needles = [`${needles}`];
-        if (!this.options.caseSensitiveMatch)
-            needles.map(v => v.toLowerCase());
         const result = initiateSearchResults(needles);
         //Checking if haystack exist and acting based on what's in the options
         if (!fs_extra_1.default.existsSync(haystack)) {
@@ -152,8 +157,11 @@ class SearchEngine {
                 throw new Error(`Option ifHaystackDoesNotExist has invalid value "${this.options.ifHaystackDoesNotExist}", allowed values are: "${Object.values(exports.notExistingOptions).join(`", "`)}"!`);
             }
         }
+        const n = needles.map(v => {
+            return { originalNeedle: v, caseAdjustedNeedle: this.options.caseSensitiveMatch ? v : v.toLowerCase() };
+        });
         result.stats.timeTaken = Date.now();
-        this.searchRecursively(result, needles, haystack, this.options.scanDepth || exports.searchEngineOptionsDefaults.scanDepth || 0);
+        this.searchRecursively(result, n, haystack, this.options.scanDepth || exports.searchEngineOptionsDefaults.scanDepth || 0);
         result.stats.timeTaken = Date.now() - result.stats.timeTaken;
         //Checking if needle exist and acting based on what's in the options
         if (result.stats.resultsFound < 1 && this.options.ifNeedleDoesNotExist === exports.notExistingOptions.throwError) {
@@ -167,6 +175,7 @@ class SearchEngine {
 }
 exports.SearchEngine = SearchEngine;
 //======[TESTING]================================================================================================
+// console.log((new SearchEngine({scanDepth: 1})).search([`Enlarge A4 101%.eal`, `Convert Color to Gray and Keep Black Text.eal`], `D:/Switch Resources - Local/action_lists/auto_fixes/dagenham`));
 // console.log((new SearchEngine({scanDepth: 1})).search([`6pp`, `4pp`], `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`));
 // const scanLocation: string  =       `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`;
 // const numberOfScans: number =       10;
