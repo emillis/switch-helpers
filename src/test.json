@@ -1,0 +1,242 @@
+[
+  {
+    "value": "Nav Job Number",
+    "x": 50,
+    "y": 50,
+    "fontSize": 11
+  },
+  {
+    "value": "Quantity",
+    "x": 50,
+    "y": 65,
+    "fontSize": 11
+  },
+  {
+    "value": "App ID",
+    "x": 50,
+    "y": 80,
+    "fontSize": 11
+  },
+  {
+    "value": "Document Type",
+    "x": 50,
+    "y": 95,
+    "fontSize": 11
+  },
+  {
+    "value": "Finished Size",
+    "x": 50,
+    "y": 110,
+    "fontSize": 11
+  },
+  {
+    "value": "Number Of Pages",
+    "x": 50,
+    "y": 125,
+    "fontSize": 11
+  },
+  {
+    "value": "Plex",
+    "x": 50,
+    "y": 140,
+    "fontSize": 11
+  },
+  {
+    "value": "Cover Stock",
+    "x": 50,
+    "y": 155,
+    "fontSize": 11
+  },
+  {
+    "value": "Text Stock",
+    "x": 50,
+    "y": 170,
+    "fontSize": 11
+  },
+  {
+    "value": "Finishing",
+    "x": 50,
+    "y": 185,
+    "fontSize": 11
+  },
+  {
+    "value": "Perf And Position",
+    "x": 50,
+    "y": 200,
+    "fontSize": 11
+  },
+  {
+    "value": "Notes",
+    "x": 50,
+    "y": 215,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 230,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 245,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 260,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 275,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 290,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 305,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 320,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 50,
+    "y": 335,
+    "fontSize": 11
+  },
+  {
+    "value": "S111908-6",
+    "x": 200,
+    "y": 50,
+    "fontSize": 11
+  },
+  {
+    "value": "20",
+    "x": 200,
+    "y": 65,
+    "fontSize": 11
+  },
+  {
+    "value": "QDFIL05",
+    "x": 200,
+    "y": 80,
+    "fontSize": 11
+  },
+  {
+    "value": "BOOKLET",
+    "x": 200,
+    "y": 95,
+    "fontSize": 11
+  },
+  {
+    "value": "A4",
+    "x": 200,
+    "y": 110,
+    "fontSize": 11
+  },
+  {
+    "value": "10",
+    "x": 200,
+    "y": 125,
+    "fontSize": 11
+  },
+  {
+    "value": "DUPLEX",
+    "x": 200,
+    "y": 140,
+    "fontSize": 11
+  },
+  {
+    "value": "Revive Silk 170	- USE PCC HOUSE STOCK ALTERNATIVE",
+    "x": 200,
+    "y": 155,
+    "fontSize": 11
+  },
+  {
+    "value": "Revive Silk 130gsm - USE PCC HOUSE STOCK ALTERNATIVE",
+    "x": 200,
+    "y": 170,
+    "fontSize": 11
+  },
+  {
+    "value": "Fold, Trim and Saddle stitched",
+    "x": 200,
+    "y": 185,
+    "fontSize": 11
+  },
+  {
+    "value": "N/A",
+    "x": 200,
+    "y": 200,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 215,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 230,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 245,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 260,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 275,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 290,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 305,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 320,
+    "fontSize": 11
+  },
+  {
+    "value": "",
+    "x": 200,
+    "y": 335,
+    "fontSize": 11
+  }
+]

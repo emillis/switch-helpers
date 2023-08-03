@@ -1,3 +1,4 @@
+import * as async from "async"
 import fs from "fs-extra";
 import path from "path";
 
@@ -30,12 +31,19 @@ export const searchEngineOptionsDefaults: searchEngineOptions = {
     ifNeedleDoesNotExist: notExistingOptions.returnEmptyResults
 }
 
+type genericResult = {
+    full: string[],
+    name: string[],
+    nameProper: string[]
+}
+
+type needleResult = genericResult & {
+    resultsFount: number
+}
+
 export type searchResult = {
-    results: {
-        full?: string[],
-        name?: string[],
-        nameProper?: string[]
-    },
+    allResults: genericResult,
+    needleResults: { [needle: string]: needleResult }
     stats: {
         foldersScanned: number,
         entitiesCompared: number,
@@ -85,11 +93,14 @@ function makeSenseOutOfOptions(opt?: searchEngineOptions): searchEngineOptions {
 }
 
 //Returns a new "searchResult" object
-function initiateSearchResults(returnTypes?: returnTypes): searchResult {
-    returnTypes = returnTypes || searchEngineOptionsDefaults.returnTypes
-
+function initiateSearchResults(needles: string[]): searchResult {
     const result: searchResult = {
-        results: {},
+        allResults: {
+            full: [],
+            name: [],
+            nameProper: []
+        },
+        needleResults: {},
         stats: {
             foldersScanned: 0,
             entitiesCompared: 0,
@@ -98,17 +109,7 @@ function initiateSearchResults(returnTypes?: returnTypes): searchResult {
         }
     }
 
-    if (returnTypes !== undefined) {
-        if (returnTypes.name) {
-            result.results.name = []
-        }
-        if (returnTypes.full) {
-            result.results.full = []
-        }
-        if (returnTypes.nameProper) {
-            result.results.nameProper = []
-        }
-    }
+    for (const needle of needles) result.needleResults[needle] = {full: [], name: [], nameProper: [], resultsFount: 0}
 
     return result
 }
@@ -120,11 +121,7 @@ export class SearchEngine {
         return makeSenseOutOfOptions(options)
     }
 
-    private initiateSearchResults(): searchResult {
-        return initiateSearchResults(this.options.returnTypes)
-    }
-
-    private searchRecursively(results: searchResult, needle: string, haystack: string, depth: number) {
+    private searchRecursively(results: searchResult, needles: string[], haystack: string, depth: number) {
         let newDepth = depth - 1;
         results.stats.foldersScanned++
 
@@ -135,21 +132,27 @@ export class SearchEngine {
             const fullPath = path.join(haystack, hayOriginal).replaceAll("\\", "/");
             const isDir = dirent.isDirectory();
 
-            if (isDir && newDepth >= 0) {
-                this.searchRecursively(results, needle, fullPath, newDepth)
-            }
+            if (isDir && newDepth >= 0) this.searchRecursively(results, needles, fullPath, newDepth)
 
-            if (this.options.allowPartialMatch && hay.search(needle) === -1) {
-                continue
-            } else if (!this.options.allowPartialMatch && hay !== needle) {
-                continue
+            const belongsToNeedles: string[] = [];
+
+            if (this.options.allowPartialMatch) {
+                let found: boolean = false;
+
+                for (const needle of needles) {
+                    if (!hay.includes(needle)) continue
+                    found = true;
+                    belongsToNeedles.push(needle)
+                }
+
+                if (!found) continue
+            } else {
+                if (needles.includes(hay)) continue
             }
 
             const parsedName = path.parse(hayOriginal);
 
-            if (!isDir && this.options.allowedExt && this.options.allowedExt.length && !this.options.allowedExt.includes(parsedName.ext.toLowerCase())) {
-                continue
-            }
+            if (!isDir && this.options.allowedExt && this.options.allowedExt.length && !this.options.allowedExt.includes(parsedName.ext.toLowerCase())) continue
 
             if (this.options.searchTarget !== searchTarget.both) {
                 if (this.options.searchTarget === searchTarget.folders && dirent.isFile()) {
@@ -160,29 +163,33 @@ export class SearchEngine {
                 }
             }
 
-            if (results.results.full) {
-                results.results.full.push(fullPath)
-            }
-            if (results.results.name) {
-                results.results.name.push(parsedName.base)
-            }
-            if (results.results.nameProper) {
-                results.results.nameProper.push(parsedName.name)
+            results.allResults.full.push(fullPath)
+            results.allResults.name.push(parsedName.base)
+            results.allResults.nameProper.push(parsedName.name)
+            for (const needle of belongsToNeedles) {
+                const entry = results.needleResults[needle];
+                if (!entry) continue
+
+                entry.full.push(fullPath)
+                entry.name.push(parsedName.base)
+                entry.nameProper.push(parsedName.name)
+                entry.resultsFount++
             }
 
             results.stats.resultsFound++
         }
     }
 
-    public search(needle: string, haystack: string): searchResult {
-        needle = this.options.caseSensitiveMatch ? needle : needle.toLowerCase();
+    public search(needles: string | string[], haystack: string): searchResult {
+        if (!Array.isArray(needles)) needles = [`${needles}`];
+        if (!this.options.caseSensitiveMatch) needles.map(v => v.toLowerCase())
 
-        const result: searchResult = this.initiateSearchResults();
+        const result: searchResult = initiateSearchResults(needles);
 
         //Checking if haystack exist and acting based on what's in the options
         if (!fs.existsSync(haystack)) {
             if (this.options.ifHaystackDoesNotExist === notExistingOptions.throwError) {
-                throw new Error(`Haystack "${haystack}" does not exist!`)
+                throw `Haystack "${haystack}" does not exist!`
             } else if (this.options.ifHaystackDoesNotExist === notExistingOptions.returnEmptyResults) {
                 return result
             } else {
@@ -190,13 +197,13 @@ export class SearchEngine {
             }
         }
 
-        result.stats.timeTaken = Date.now()
-        this.searchRecursively(result, needle, haystack, this.options.scanDepth || searchEngineOptionsDefaults.scanDepth || 0)
-        result.stats.timeTaken = Date.now() - result.stats.timeTaken
+        result.stats.timeTaken = Date.now();
+        this.searchRecursively(result, needles, haystack, this.options.scanDepth || searchEngineOptionsDefaults.scanDepth || 0)
+        result.stats.timeTaken = Date.now() - result.stats.timeTaken;
 
         //Checking if needle exist and acting based on what's in the options
         if (result.stats.resultsFound < 1 && this.options.ifNeedleDoesNotExist === notExistingOptions.throwError) {
-            throw new Error(`No results were found for needle "${needle}" in haystack "${haystack}"!`)
+            throw new Error(`No results were found for needle "${needles}" in haystack "${haystack}"!`)
         }
 
         return result
@@ -206,3 +213,18 @@ export class SearchEngine {
         this.options = this.makeSenseOutOfOptions(options);
     }
 }
+
+//======[TESTING]================================================================================================
+
+// console.log((new SearchEngine({scanDepth: 1})).search([`6pp`, `4pp`], `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`));
+
+// const scanLocation: string  =       `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`;
+// const numberOfScans: number =       10;
+// let totalScanTime: number =         0;
+//
+// for (let i=0; i<numberOfScans; i++) totalScanTime += (new SearchEngine({
+//     scanDepth: 1,
+//     returnTypes: {full: true, name: false, nameProper: false}
+// })).search(`6pp`, scanLocation).stats.timeTaken
+//
+// console.log(`After scanning location "${scanLocation}" ${numberOfScans} times, average scan time is ${Math.round(totalScanTime/numberOfScans)}`);

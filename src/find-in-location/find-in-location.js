@@ -57,10 +57,14 @@ function makeSenseOutOfOptions(opt) {
     return options;
 }
 //Returns a new "searchResult" object
-function initiateSearchResults(returnTypes) {
-    returnTypes = returnTypes || exports.searchEngineOptionsDefaults.returnTypes;
+function initiateSearchResults(needles) {
     const result = {
-        results: {},
+        allResults: {
+            full: [],
+            name: [],
+            nameProper: []
+        },
+        needleResults: {},
         stats: {
             foldersScanned: 0,
             entitiesCompared: 0,
@@ -68,17 +72,8 @@ function initiateSearchResults(returnTypes) {
             timeTaken: 0
         }
     };
-    if (returnTypes !== undefined) {
-        if (returnTypes.name) {
-            result.results.name = [];
-        }
-        if (returnTypes.full) {
-            result.results.full = [];
-        }
-        if (returnTypes.nameProper) {
-            result.results.nameProper = [];
-        }
-    }
+    for (const needle of needles)
+        result.needleResults[needle] = { full: [], name: [], nameProper: [], resultsFount: 0 };
     return result;
 }
 class SearchEngine {
@@ -86,10 +81,7 @@ class SearchEngine {
     makeSenseOutOfOptions(options) {
         return makeSenseOutOfOptions(options);
     }
-    initiateSearchResults() {
-        return initiateSearchResults(this.options.returnTypes);
-    }
-    searchRecursively(results, needle, haystack, depth) {
+    searchRecursively(results, needles, haystack, depth) {
         let newDepth = depth - 1;
         results.stats.foldersScanned++;
         for (let dirent of fs_extra_1.default.readdirSync(haystack, { withFileTypes: true, encoding: "utf-8" })) {
@@ -98,19 +90,27 @@ class SearchEngine {
             const hay = this.options.caseSensitiveMatch ? hayOriginal : hayOriginal.toLowerCase();
             const fullPath = path_1.default.join(haystack, hayOriginal).replaceAll("\\", "/");
             const isDir = dirent.isDirectory();
-            if (isDir && newDepth >= 0) {
-                this.searchRecursively(results, needle, fullPath, newDepth);
+            if (isDir && newDepth >= 0)
+                this.searchRecursively(results, needles, fullPath, newDepth);
+            const belongsToNeedles = [];
+            if (this.options.allowPartialMatch) {
+                let found = false;
+                for (const needle of needles) {
+                    if (!hay.includes(needle))
+                        continue;
+                    found = true;
+                    belongsToNeedles.push(needle);
+                }
+                if (!found)
+                    continue;
             }
-            if (this.options.allowPartialMatch && hay.search(needle) === -1) {
-                continue;
-            }
-            else if (!this.options.allowPartialMatch && hay !== needle) {
-                continue;
+            else {
+                if (needles.includes(hay))
+                    continue;
             }
             const parsedName = path_1.default.parse(hayOriginal);
-            if (!isDir && this.options.allowedExt && this.options.allowedExt.length && !this.options.allowedExt.includes(parsedName.ext.toLowerCase())) {
+            if (!isDir && this.options.allowedExt && this.options.allowedExt.length && !this.options.allowedExt.includes(parsedName.ext.toLowerCase()))
                 continue;
-            }
             if (this.options.searchTarget !== exports.searchTarget.both) {
                 if (this.options.searchTarget === exports.searchTarget.folders && dirent.isFile()) {
                     continue;
@@ -119,25 +119,31 @@ class SearchEngine {
                     continue;
                 }
             }
-            if (results.results.full) {
-                results.results.full.push(fullPath);
-            }
-            if (results.results.name) {
-                results.results.name.push(parsedName.base);
-            }
-            if (results.results.nameProper) {
-                results.results.nameProper.push(parsedName.name);
+            results.allResults.full.push(fullPath);
+            results.allResults.name.push(parsedName.base);
+            results.allResults.nameProper.push(parsedName.name);
+            for (const needle of belongsToNeedles) {
+                const entry = results.needleResults[needle];
+                if (!entry)
+                    continue;
+                entry.full.push(fullPath);
+                entry.name.push(parsedName.base);
+                entry.nameProper.push(parsedName.name);
+                entry.resultsFount++;
             }
             results.stats.resultsFound++;
         }
     }
-    search(needle, haystack) {
-        needle = this.options.caseSensitiveMatch ? needle : needle.toLowerCase();
-        const result = this.initiateSearchResults();
+    search(needles, haystack) {
+        if (!Array.isArray(needles))
+            needles = [`${needles}`];
+        if (!this.options.caseSensitiveMatch)
+            needles.map(v => v.toLowerCase());
+        const result = initiateSearchResults(needles);
         //Checking if haystack exist and acting based on what's in the options
         if (!fs_extra_1.default.existsSync(haystack)) {
             if (this.options.ifHaystackDoesNotExist === exports.notExistingOptions.throwError) {
-                throw new Error(`Haystack "${haystack}" does not exist!`);
+                throw `Haystack "${haystack}" does not exist!`;
             }
             else if (this.options.ifHaystackDoesNotExist === exports.notExistingOptions.returnEmptyResults) {
                 return result;
@@ -147,11 +153,11 @@ class SearchEngine {
             }
         }
         result.stats.timeTaken = Date.now();
-        this.searchRecursively(result, needle, haystack, this.options.scanDepth || exports.searchEngineOptionsDefaults.scanDepth || 0);
+        this.searchRecursively(result, needles, haystack, this.options.scanDepth || exports.searchEngineOptionsDefaults.scanDepth || 0);
         result.stats.timeTaken = Date.now() - result.stats.timeTaken;
         //Checking if needle exist and acting based on what's in the options
         if (result.stats.resultsFound < 1 && this.options.ifNeedleDoesNotExist === exports.notExistingOptions.throwError) {
-            throw new Error(`No results were found for needle "${needle}" in haystack "${haystack}"!`);
+            throw new Error(`No results were found for needle "${needles}" in haystack "${haystack}"!`);
         }
         return result;
     }
@@ -160,3 +166,15 @@ class SearchEngine {
     }
 }
 exports.SearchEngine = SearchEngine;
+//======[TESTING]================================================================================================
+// console.log((new SearchEngine({scanDepth: 1})).search([`6pp`, `4pp`], `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`));
+// const scanLocation: string  =       `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`;
+// const numberOfScans: number =       10;
+// let totalScanTime: number =         0;
+//
+// for (let i=0; i<numberOfScans; i++) totalScanTime += (new SearchEngine({
+//     scanDepth: 1,
+//     returnTypes: {full: true, name: false, nameProper: false}
+// })).search(`6pp`, scanLocation).stats.timeTaken
+//
+// console.log(`After scanning location "${scanLocation}" ${numberOfScans} times, average scan time is ${Math.round(totalScanTime/numberOfScans)}`);
