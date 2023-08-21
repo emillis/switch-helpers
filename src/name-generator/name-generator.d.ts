@@ -1,9 +1,10 @@
-export declare type dateOptions = {
+export type dateOptions = {
     format?: string;
     separator?: string;
 };
 export declare function newDate(dateOptions?: dateOptions): string;
-export declare type options = {
+
+export type options = {
     prefix?: string;
     suffix?: string;
     separator?: string;
@@ -15,20 +16,20 @@ export declare const generationTypes: {
     readonly dateTime: "dateTime";
     readonly random: "random";
 };
-export declare type generationTypes = typeof generationTypes[keyof typeof generationTypes];
+export type generationTypes = typeof generationTypes[keyof typeof generationTypes];
 export declare const charCase: {
     readonly upperOnly: "upperOnly";
     readonly lowerOnly: "lowerOnly";
     readonly any: "any";
 };
-export declare type charCase = typeof charCase[keyof typeof charCase];
+export type charCase = typeof charCase[keyof typeof charCase];
 export declare const composition: {
     readonly alphaOnly: "alphaOnly";
     readonly numericOnly: "numericOnly";
     readonly alphaNumericOnly: "alphaNumericOnly";
 };
-export declare type composition = typeof composition[keyof typeof composition];
-export declare type advanceOptions = {
+export type composition = typeof composition[keyof typeof composition];
+export type advanceOptions = {
     type?: generationTypes;
     dateTimeFormat?: string;
     charCase?: charCase;

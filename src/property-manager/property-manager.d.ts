@@ -1,15 +1,15 @@
 /// <reference types="switch-scripting" />
-export declare type propertyManagerOptions = {
+export type propertyManagerOptions = {
     throwErrorIfTagUndefined?: boolean;
 };
-export declare type getPropertyFromListOptions = {
+export type getPropertyFromListOptions = {
     caseSensitive?: boolean;
     partialMatch?: boolean;
 };
-export declare type arrayPropertyOptions = {
+export type arrayPropertyOptions = {
     separator?: string;
 };
-export declare type getStringPropertyOptions = {
+export type getStringPropertyOptions = {
     separatorIfArray?: string;
 };
 export declare class PropertyManager {

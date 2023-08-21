@@ -27,6 +27,8 @@ function makeSenseOutOfOptions(opt) {
     else {
         for (let i = 0; i < options.allowedExt.length; i++) {
             let ext = options.allowedExt[i].toLowerCase().trim();
+            if (!ext)
+                continue;
             if (ext[0] !== ".") {
                 ext = `.${ext}`;
             }
