@@ -1,15 +1,15 @@
 import {ResizeOptions, Sharp} from "sharp";
 
-export type allowedSuffixOptions = `none` | `dimensions` | `widthOnly` | `heightOnly`;
-export type resizerSaveOptions = {
+export declare type allowedSuffixOptions = `none` | `dimensions` | `widthOnly` | `heightOnly`;
+export declare type resizerSaveOptions = {
     suffix?: allowedSuffixOptions;
     separator?: string;
 };
-export type imageOption = {
+export declare type imageOption = {
     w?: number;
     h?: number;
     o?: ResizeOptions;
 };
-export type imageToSave = imageOption & {
+export declare type imageToSave = imageOption & {
     image: Sharp;
 };

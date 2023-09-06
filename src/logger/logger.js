@@ -123,7 +123,8 @@ class Logger {
         return fs.createWriteStream(logFileLoc, {
             encoding: "utf-8",
             autoClose: true,
-            flags: 'as'
+            flags: 'as',
+            mode: 0o777
         });
     }
     getWriteStream() {

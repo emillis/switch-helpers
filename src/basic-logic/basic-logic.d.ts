@@ -6,7 +6,7 @@ export declare const allowedLogicalOperators: {
     readonly MoreThan: ">";
     readonly MoreThanOrEqual: ">=";
 };
-export type allowedLogicalOperators = typeof allowedLogicalOperators[keyof typeof allowedLogicalOperators];
+export declare type allowedLogicalOperators = typeof allowedLogicalOperators[keyof typeof allowedLogicalOperators];
 export interface ElseIfAndElse {
     ElseIf(val: boolean, callback: () => any): Promise<ElseIfAndElse>;
     Else(callback: () => any): Promise<void>;

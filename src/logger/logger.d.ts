@@ -4,8 +4,8 @@ import * as fs from "fs-extra";
 export declare const allowedLogTypes: {
     readonly JSON: "json";
 };
-export type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogTypes];
-export type writeData = {
+export declare type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogTypes];
+export declare type writeData = {
     [key: string]: string;
 };
 
@@ -15,7 +15,7 @@ export interface Writer {
     }): number;
 }
 
-export type loggerOptions = {
+export declare type loggerOptions = {
     maxLogSize?: number;
     writer?: Writer;
     uriEncodeWrittenValues?: boolean;

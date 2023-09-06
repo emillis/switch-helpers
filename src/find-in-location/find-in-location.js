@@ -177,6 +177,17 @@ class SearchEngine {
 }
 exports.SearchEngine = SearchEngine;
 //======[TESTING]================================================================================================
+// const se = new SearchEngine({
+//     scanDepth: 0,
+//     allowPartialMatch: true,
+//     caseSensitiveMatch: false,
+//     allowedExt: [],
+//     searchTarget: `files`,
+//     ifHaystackDoesNotExist: `returnEmptyResults`,
+//     ifNeedleDoesNotExist: `returnEmptyResults`
+// })
+//
+// console.log(se.search([`CRITICAL CHECK.ppp`], `D:\\Switch Resources\\Profiles`));
 // console.log((new SearchEngine({scanDepth: 1})).search([`Enlarge A4 101%.eal`, `Convert Color to Gray and Keep Black Text.eal`], `D:/Switch Resources - Local/action_lists/auto_fixes/dagenham`));
 // console.log((new SearchEngine({scanDepth: 1})).search([`6pp`, `4pp`], `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`));
 // const scanLocation: string  =       `//10.1.6.81/AraxiVolume_HW35899-71_J/Jobs`;

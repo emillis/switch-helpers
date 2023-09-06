@@ -1,13 +1,13 @@
-export type zipperOptions = {
+export declare type zipperOptions = {
     archiveName?: string;
     tmpLocation?: string;
     compressionLevel?: number;
 };
-export type compressionOptions = {
+export declare type compressionOptions = {
     failIfFileMissing?: boolean;
     randomizeNamesInArchive?: boolean;
 };
-export type addFileOptions = {
+export declare type addFileOptions = {
     newName?: string;
 };
 export declare class Zip {
