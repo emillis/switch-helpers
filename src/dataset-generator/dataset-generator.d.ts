@@ -3,8 +3,8 @@ export declare const allowedDatasetModels: {
     readonly JSON: "JSON";
     readonly Opaque: "Opaque";
 };
-export declare type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
-export declare type options = {
+export type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
+export type options = {
     replaceIfExist?: boolean;
 };
 

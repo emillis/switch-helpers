@@ -1,10 +1,10 @@
 /// <reference types="switch-scripting" />
-export declare type config = {
+export type config = {
     tag: string;
     scope?: Scope;
     loadJobs?: boolean;
 };
-export declare type entry<T> = {
+export type entry<T> = {
     _id: string;
     _timeAdded: number;
     _timeModified: number;
@@ -29,7 +29,7 @@ export declare class Entry<T> {
     constructor(e: entry<T>, job?: Job);
 }
 
-export declare type addOptions = {
+export type addOptions = {
     id?: string;
     job?: Job;
     jobRetrievalCount?: number;

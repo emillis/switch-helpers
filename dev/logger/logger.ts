@@ -95,6 +95,7 @@ export class Logger {
         return fullLoc
     }
 
+
     //Checks for existing files withing the root location and changes new log file name accordingly
     private generateNewLogName(): string {
         const existingFiles: string[] = [];
