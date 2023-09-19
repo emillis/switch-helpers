@@ -2,7 +2,7 @@ import {GlobalSwitchConfig, NameGenerator} from "../main";
 import fs from "fs-extra";
 import path from "path";
 
-export const allowedDatasetModels = {JSON: "JSON", Opaque: "Opaque"} as const;
+export const allowedDatasetModels = {JSON: "JSON", XML: "XML", Opaque: "Opaque"} as const;
 export type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
 
 export type options = {
@@ -54,6 +54,27 @@ export class DatasetGenerator {
         return location;
     }
 
+    private async addXmlDataset(datasetName: string, data: string): Promise<string> {
+        let location: string = "";
+        for (; ;) {
+            location = path.join(this.tmpFileLocation, `tmp-xml-dataset-${this.nameGenerator.generate()}-${this.nameGenerator.generate()}.xml`);
+
+            if (fs.existsSync(location)) {
+                continue
+            }
+
+            break
+        }
+
+        if (!location) throw `Failed to generate a new name for XML dataset file!`;
+
+        fs.writeFileSync(location, data)
+
+        await this.job.createDataset(datasetName, location, EnfocusSwitch.DatasetModel.XML);
+
+        return location;
+    }
+
     private async addOpaqueDataset(datasetName: string, data: any) {
         await this.job.createDataset(datasetName, data, EnfocusSwitch.DatasetModel.Opaque);
     }
@@ -75,9 +96,13 @@ export class DatasetGenerator {
         if (options.replaceIfExist) {
             try {
                 await this.job.removeDataset(datasetName)
-            } catch {}
+            } catch {
+            }
         }
 
+        if (model === allowedDatasetModels.XML) {
+            this.tmpFileLocations.push(await this.addXmlDataset(datasetName, data))
+        }
         if (model === allowedDatasetModels.JSON) {
             this.tmpFileLocations.push(await this.addJsonDataset(datasetName, data))
         } else if (model === allowedDatasetModels.Opaque) {

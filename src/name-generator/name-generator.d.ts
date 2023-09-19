@@ -3,7 +3,6 @@ export type dateOptions = {
     separator?: string;
 };
 export declare function newDate(dateOptions?: dateOptions): string;
-
 export type options = {
     prefix?: string;
     suffix?: string;

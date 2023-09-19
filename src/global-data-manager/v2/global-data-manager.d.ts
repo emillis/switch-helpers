@@ -28,7 +28,6 @@ export declare class Entry<T> {
     getEntryDataObject(): entry<T>;
     constructor(e: entry<T>, job?: Job);
 }
-
 export type addOptions = {
     id?: string;
     job?: Job;

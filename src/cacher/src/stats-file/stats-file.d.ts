@@ -22,7 +22,6 @@ export declare class GroupsManager {
     runCleanup(): void;
     constructor(groupJson: any);
 }
-
 export type statsFile = {
     groups: groups;
 };

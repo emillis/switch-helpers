@@ -7,7 +7,7 @@ exports.DatasetGenerator = exports.allowedDatasetModels = void 0;
 const main_1 = require("../main");
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
-exports.allowedDatasetModels = { JSON: "JSON", Opaque: "Opaque" };
+exports.allowedDatasetModels = { JSON: "JSON", XML: "XML", Opaque: "Opaque" };
 function makeOptionsReasonable(options) {
     options = options || {};
     if (options.replaceIfExist === undefined)
@@ -45,6 +45,21 @@ class DatasetGenerator {
         await this.job.createDataset(datasetName, location, EnfocusSwitch.DatasetModel.JSON);
         return location;
     }
+    async addXmlDataset(datasetName, data) {
+        let location = "";
+        for (;;) {
+            location = path_1.default.join(this.tmpFileLocation, `tmp-xml-dataset-${this.nameGenerator.generate()}-${this.nameGenerator.generate()}.xml`);
+            if (fs_extra_1.default.existsSync(location)) {
+                continue;
+            }
+            break;
+        }
+        if (!location)
+            throw `Failed to generate a new name for XML dataset file!`;
+        fs_extra_1.default.writeFileSync(location, data);
+        await this.job.createDataset(datasetName, location, EnfocusSwitch.DatasetModel.XML);
+        return location;
+    }
     async addOpaqueDataset(datasetName, data) {
         await this.job.createDataset(datasetName, data, EnfocusSwitch.DatasetModel.Opaque);
     }
@@ -67,7 +82,11 @@ class DatasetGenerator {
             try {
                 await this.job.removeDataset(datasetName);
             }
-            catch { }
+            catch {
+            }
+        }
+        if (model === exports.allowedDatasetModels.XML) {
+            this.tmpFileLocations.push(await this.addXmlDataset(datasetName, data));
         }
         if (model === exports.allowedDatasetModels.JSON) {
             this.tmpFileLocations.push(await this.addJsonDataset(datasetName, data));
