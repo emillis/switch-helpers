@@ -18,3 +18,4 @@ export * as PdfDuplicator from "./pdf-page-duplicator/pdf-page-duplicator";
 export * as PdfSplitter from "./pdf-doc-splitter/pdf-doc-splitter";
 export * as ImageTransformer from "./image-transformer/image-transformer";
 export * as PdfBannerPage from "./pdf-banner-page/pdf-banner-page";
+export * as JobPackUnpack from "./job-pack-unpack/index";
