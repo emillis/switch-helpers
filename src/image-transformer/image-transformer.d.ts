@@ -1,4 +1,4 @@
-import {ResizeOptions, Sharp} from "sharp";
+import { ResizeOptions, Sharp } from "sharp";
 export type allowedSuffixOptions = `none` | `dimensions` | `widthOnly` | `heightOnly`;
 export type resizerSaveOptions = {
     suffix?: allowedSuffixOptions;

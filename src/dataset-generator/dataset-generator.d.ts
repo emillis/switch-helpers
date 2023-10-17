@@ -4,11 +4,10 @@ export declare const allowedDatasetModels: {
     readonly XML: "XML";
     readonly Opaque: "Opaque";
 };
-export declare type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
-export declare type options = {
+export type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
+export type options = {
     replaceIfExist?: boolean;
 };
-
 export declare class DatasetGenerator {
     private readonly job;
     private readonly tmpFileLocation;

@@ -1,6 +1,5 @@
 /// <reference types="node" />
 import * as fs from "fs-extra";
-
 export declare const allowedLogTypes: {
     readonly JSON: "json";
 };
@@ -8,13 +7,11 @@ export type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogType
 export type writeData = {
     [key: string]: string;
 };
-
 export interface Writer {
     write(stream: fs.WriteStream, data: {
         [k: string]: string;
     }): number;
 }
-
 export type loggerOptions = {
     maxLogSize?: number;
     writer?: Writer;

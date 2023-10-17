@@ -16,6 +16,7 @@
     "async": "^3.2.4",
     "csv-reader": "^1.0.11",
     "dateformat": "^5.0.3",
+    "decompress": "^4.2.1",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.1",
     "path": "^0.12.7",
@@ -26,6 +27,7 @@
     "@types/archiver": "^5.3.2",
     "@types/async": "^3.2.20",
     "@types/dateformat": "^5.0.0",
+    "@types/decompress": "^4.2.5",
     "@types/fs-extra": "^11.0.1",
     "@types/node": "16.11.7",
     "@types/switch-scripting": "https://github.com/enfocus-switch/types-switch-scripting/archive/22.0.0.tar.gz"
