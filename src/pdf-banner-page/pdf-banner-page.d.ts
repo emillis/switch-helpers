@@ -2,14 +2,14 @@ export declare const bannerPageLocation: {
     readonly start: "start";
     readonly end: "end";
 };
-export type bannerPageLocation = typeof bannerPageLocation[keyof typeof bannerPageLocation];
-export type dataEntry = {
+export declare type bannerPageLocation = typeof bannerPageLocation[keyof typeof bannerPageLocation];
+export declare type dataEntry = {
     value: string;
     posX: number;
     posY: number;
     fontSize: number;
 };
-export type addSheetOptions = {
+export declare type addSheetOptions = {
     dataEntries: dataEntry[];
     width?: number;
     height?: number;

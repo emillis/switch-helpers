@@ -27,10 +27,10 @@ class JobPacker {
     }
     async packExternalMetadata(loc, def, job) {
         for (const m of def.metadata.external)
-            fs_extra_1.default.copyFileSync(await job.getDataset(m.name, AccessLevel.ReadOnly), path_1.default.join(loc, `${m.name}.${m.extension}`));
+            fs_extra_1.default.copyFileSync(await job.getDataset(m.name, EnfocusSwitch.AccessLevel.ReadOnly), path_1.default.join(loc, `${m.name}.${m.extension}`));
     }
     async packJobFile(loc, def, job) {
-        fs_extra_1.default.copyFileSync(await job.get(AccessLevel.ReadOnly), path_1.default.join(loc, def.file.originalName));
+        fs_extra_1.default.copyFileSync(await job.get(EnfocusSwitch.AccessLevel.ReadOnly), path_1.default.join(loc, def.file.originalName));
     }
     async saveDefinition(loc, def) {
         fs_extra_1.default.writeFileSync(path_1.default.join(loc, `definitions.json`), JSON.stringify(def), { encoding: "utf-8" });

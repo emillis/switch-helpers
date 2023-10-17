@@ -29,11 +29,11 @@ export class JobPacker {
     }
 
     private async packExternalMetadata(loc: string, def: definitions.v1.definitionStructure, job: Job) {
-        for (const m of def.metadata.external) fs.copyFileSync(await job.getDataset(m.name, AccessLevel.ReadOnly), path.join(loc, `${m.name}.${m.extension}`))
+        for (const m of def.metadata.external) fs.copyFileSync(await job.getDataset(m.name, EnfocusSwitch.AccessLevel.ReadOnly), path.join(loc, `${m.name}.${m.extension}`))
     }
 
     private async packJobFile(loc: string, def: definitions.v1.definitionStructure, job: Job) {
-        fs.copyFileSync(await job.get(AccessLevel.ReadOnly), path.join(loc, def.file.originalName))
+        fs.copyFileSync(await job.get(EnfocusSwitch.AccessLevel.ReadOnly), path.join(loc, def.file.originalName))
     }
 
     private async saveDefinition(loc: string, def: definitions.v1.definitionStructure) {
