@@ -3,8 +3,8 @@ import * as fs from "fs-extra";
 export declare const allowedLogTypes: {
     readonly JSON: "json";
 };
-export declare type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogTypes];
-export declare type writeData = {
+export type allowedLogTypes = typeof allowedLogTypes[keyof typeof allowedLogTypes];
+export type writeData = {
     [key: string]: string;
 };
 export interface Writer {
@@ -12,7 +12,7 @@ export interface Writer {
         [k: string]: string;
     }): number;
 }
-export declare type loggerOptions = {
+export type loggerOptions = {
     maxLogSize?: number;
     writer?: Writer;
     uriEncodeWrittenValues?: boolean;

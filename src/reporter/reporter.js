@@ -220,7 +220,7 @@ class Reporter {
     async attachReport(job, options) {
         const datasetGenerator = new main_1.DatasetGenerator.DatasetGenerator(job, options?.tmpLocation);
         const reportLocation = this.saveAsHtml({ location: options.tmpLocation, name: options.tmpReportFileName });
-        await datasetGenerator.addDataset(options.datasetName, main_1.DatasetGenerator.allowedDatasetModels.Opaque, reportLocation, { replaceIfExist: true });
+        await datasetGenerator.addDataset(options.datasetName, EnfocusSwitch.DatasetModel.Opaque, reportLocation, false, { replaceIfExist: true });
         return reportLocation;
     }
     async sendWithReportAttached(job, flowElement, options) {

@@ -1,28 +1,28 @@
 /// <reference types="switch-scripting" />
-export declare type externalMetadata = {
+export type externalMetadata = {
     path: string;
     name: string;
     extension: string;
     model: DatasetModel;
 };
-export declare type internalMetadata = {
+export type internalMetadata = {
     key: string;
     value: string;
 };
-export declare type metadata = {
+export type metadata = {
     external: externalMetadata[];
     internal: internalMetadata[];
 };
-export declare type fileDef = {
+export type fileDef = {
     path: string;
     originalName: string;
     originalPrefix: string;
 };
-export declare type privateDataSignature = {
+export type privateDataSignature = {
     tag: string;
     value: any;
 };
-export declare type definitionStructure = {
+export type definitionStructure = {
     privateData: privateDataSignature[];
     metadata: metadata;
     file: fileDef;

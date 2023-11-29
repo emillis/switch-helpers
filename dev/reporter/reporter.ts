@@ -216,7 +216,7 @@ export class Reporter implements IReporter{
     async attachReport(job: Job, options: {datasetName: string, tmpLocation?: string, tmpReportFileName?: string}): Promise<string> {
         const datasetGenerator = new DatasetGenerator.DatasetGenerator(job, options?.tmpLocation);
         const reportLocation = this.saveAsHtml({location: options.tmpLocation, name: options.tmpReportFileName})
-        await datasetGenerator.addDataset(options.datasetName, DatasetGenerator.allowedDatasetModels.Opaque, reportLocation, {replaceIfExist: true})
+        await datasetGenerator.addDataset(options.datasetName, EnfocusSwitch.DatasetModel.Opaque, reportLocation, false, {replaceIfExist: true})
         return reportLocation
     }
 

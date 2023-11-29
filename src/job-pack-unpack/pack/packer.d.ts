@@ -1,5 +1,5 @@
 /// <reference types="switch-scripting" />
-export declare type jobPackerOptions = {};
+export type jobPackerOptions = {};
 export declare class JobPacker {
     private readonly tmpLoc;
     private readonly options;

@@ -1,11 +1,5 @@
 /// <reference types="switch-scripting" />
-export declare const allowedDatasetModels: {
-    readonly JSON: "JSON";
-    readonly XML: "XML";
-    readonly Opaque: "Opaque";
-};
-export type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
-export type options = {
+export declare type options = {
     replaceIfExist?: boolean;
 };
 export declare class DatasetGenerator {
@@ -13,11 +7,12 @@ export declare class DatasetGenerator {
     private readonly tmpFileLocation;
     private readonly nameGenerator;
     private tmpFileLocations;
-    private checkForAllowedDatasetModels;
     private addJsonDataset;
     private addXmlDataset;
+    private addXmpDataset;
+    private addJdfDataset;
     private addOpaqueDataset;
-    addDataset(datasetName: string, model: allowedDatasetModels, data: any, options?: options): Promise<void>;
+    addDataset(datasetName: string, model: DatasetModel, data: any, isDataAFile: boolean, options?: options): Promise<void>;
     removeTmpFiles(): void;
     constructor(job: Job, tmpFileLocation?: string);
 }
