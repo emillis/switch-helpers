@@ -1,5 +1,5 @@
 /// <reference types="switch-scripting" />
-export declare type options = {
+export type options = {
     replaceIfExist?: boolean;
 };
 export declare class DatasetGenerator {

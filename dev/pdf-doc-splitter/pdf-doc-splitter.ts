@@ -118,7 +118,7 @@ export class Splitter {
     constructor(pdfLocation: string) {
         this.pdfLocation = pdfLocation
         const ext = path.parse(this.pdfLocation).ext
-        if (ext !== `.pdf`) throw `Only PDF files are allowed to Pdf Page Duplicator! Got "${ext}" file!`;
+        if (ext.toLowerCase() !== `.pdf`) throw `Only PDF files are allowed to Pdf Page Duplicator! Got "${ext}" file!`;
     }
     async init(): Promise<Splitter> {
         if (this.initialized) throw `Duplicator was already initialized!`;
