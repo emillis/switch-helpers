@@ -100,7 +100,7 @@ export class Splitter {
 
         if (!location || !path.isAbsolute(location)) throw `Invalid location "${location}" provided as PDF saving location!`;
         const parsedLocation = path.parse(location);
-        if (parsedLocation.ext !== ".pdf") {
+        if (parsedLocation.ext.toLowerCase() !== ".pdf") {
             location = path.join(location, path.parse(this.pdfLocation).name)
         } else {
             location = path.join(parsedLocation.dir, parsedLocation.name)
