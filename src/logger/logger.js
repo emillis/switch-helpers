@@ -122,7 +122,6 @@ class Logger {
         }
         return fs.createWriteStream(logFileLoc, {
             encoding: "utf-8",
-            autoClose: true,
             flags: 'as',
             mode: 0o777
         });
@@ -142,6 +141,10 @@ class Logger {
             this.openLogFileStats = fs.lstatSync(loc);
             this.writeStream = await this.openLogFile(loc);
         }
+        try {
+            this.writeStream.close();
+        }
+        catch { }
     }
     constructor(rootLocation, id, options) {
         if (!fs.pathExistsSync(rootLocation))

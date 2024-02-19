@@ -140,7 +140,6 @@ export class Logger {
 
         return fs.createWriteStream(logFileLoc, {
             encoding: "utf-8",
-            autoClose: true,
             flags: 'as',
             mode: 0o777
         })
@@ -164,6 +163,8 @@ export class Logger {
             this.openLogFileStats = fs.lstatSync(loc)
             this.writeStream = await this.openLogFile(loc)
         }
+
+        try {this.writeStream.close()} catch {}
     }
 
     constructor(rootLocation: string, id: string, options?: loggerOptions) {

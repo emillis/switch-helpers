@@ -2,9 +2,6 @@ import {GlobalSwitchConfig, NameGenerator} from "../main";
 import fs from "fs-extra";
 import path from "path";
 
-// export const allowedDatasetModels = {JSON: "JSON", XML: "XML", Opaque: "Opaque"} as const;
-// export type allowedDatasetModels = typeof allowedDatasetModels[keyof typeof allowedDatasetModels];
-
 export type options = {
     replaceIfExist?: boolean
 }
